@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background -->
+  <rect width="32" height="32" rx="5" fill="#111111"/>
+  <!-- L — white -->
+  <text x="7.5" y="23"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif"
+        font-size="17"
+        font-weight="300"
+        fill="#FFFFFF">L</text>
+  <!-- G — blue -->
+  <text x="16.5" y="23"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif"
+        font-size="17"
+        font-weight="300"
+        fill="#1D4ED8">G</text>
+</svg>
