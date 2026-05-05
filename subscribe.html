@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subscribe — AI × Business Insights | Luca Giacomelli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/nav.css" />
+  <link rel="stylesheet" href="css/paywall.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="main-nav" class="scrolled">
+    <a href="index.html" class="nav-logo">Luca Giacomelli</a>
+    <div class="nav-right" style="opacity:1;">
+      <a href="index.html#about">About</a>
+      <a href="insights.html">Insights</a>
+      <a href="index.html#advisory">Advisory</a>
+      <a href="index.html#contact" class="nav-cta">Let's talk</a>
+    </div>
+  </nav>
+
+  <div class="subscribe-hero">
+    <div class="subscribe-card">
+
+      <p class="section-num">Subscription</p>
+      <h1>AI × Business<br/>Insights</h1>
+      <p class="deck">
+        Every 2–3 days: one AI news event, one business framework,
+        one technical perspective. The three most recent are always free.
+      </p>
+
+      <ul class="subscribe-perks">
+        <li>
+          <span class="perk-icon">📖</span>
+          <span>Full access to the entire insights archive — past and future</span>
+        </li>
+        <li>
+          <span class="perk-icon">⚡</span>
+          <span>All interactive demos and calculators, fully unlocked</span>
+        </li>
+        <li>
+          <span class="perk-icon">🎯</span>
+          <span>Each piece connects real AI news to MBA frameworks and engineering reality</span>
+        </li>
+        <li>
+          <span class="perk-icon">🔓</span>
+          <span>Cancel any time — no lock-in, no questions asked</span>
+        </li>
+      </ul>
+
+      <div class="subscribe-price-row">
+        <span class="big-price" id="price-display">$19</span>
+        <span class="price-period">/ month</span>
+      </div>
+
+      <a href="#" id="subscribe-btn" class="btn-primary" style="display:block;text-align:center;margin-bottom:0.75rem;">
+        Subscribe with Stripe →
+      </a>
+      <p class="subscribe-note">
+        Secure payment via Stripe. Cancel anytime from your customer portal.
+      </p>
+
+      <!-- Restore access section -->
+      <div class="restore-section" id="restore">
+        <p>Already subscribed? If you've cleared your browser data or switched devices, restore your access here.</p>
+        <a href="#" id="restore-btn" class="btn-secondary" style="display:inline-block;">
+          Restore my access
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer style="background:var(--black);border-top:1px solid rgba(255,255,255,0.06);padding:1.5rem 3rem;">
+    <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.25);">© 2026 Luca Giacomelli · AI Advisor &amp; Architect</p>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="insights.html" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Insights</a>
+        <a href="index.html#contact" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/insights.js"></script>
+  <script src="js/subscription.js"></script>
+  <script>
+    // Wire up subscribe button
+    const subscribeBtn = document.getElementById('subscribe-btn');
+    subscribeBtn.href = getSubscribeUrl();
+    document.getElementById('price-display').textContent =
+      SUBSCRIPTION_PRICE.split(' ')[0];
+
+    // If already subscribed, show status
+    if (isSubscribed()) {
+      subscribeBtn.textContent = '✓ You have an active subscription';
+      subscribeBtn.style.background = '#15803D';
+      subscribeBtn.href = 'insights.html';
+    }
+
+    // Restore access: redirects to Stripe customer portal
+    document.getElementById('restore-btn').href = getPortalUrl();
+  </script>
+</body>
+</html>

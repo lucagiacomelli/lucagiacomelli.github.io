@@ -1,0 +1,75 @@
+/* ─────────────────────────────────────────
+   NAV — fixed top navigation bar
+   ───────────────────────────────────────── */
+
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  padding: 0 3rem;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.4s, border-color 0.4s;
+}
+
+nav.scrolled {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Logo */
+.nav-logo {
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 0.2s forwards;
+}
+
+/* Right-side links */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 0.3s forwards;
+}
+
+.nav-right a {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--mid);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: color 0.2s;
+}
+.nav-right a:hover { color: var(--ink); }
+
+/* CTA pill */
+.nav-cta {
+  background: var(--ink) !important;
+  color: #fff !important;
+  padding: 0.5rem 1.1rem;
+  border-radius: 100px;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  transition: opacity 0.2s !important;
+}
+.nav-cta:hover { opacity: 0.75 !important; }
+
+/* ─── RESPONSIVE ──────────────────────── */
+
+@media (max-width: 900px) {
+  nav { padding: 0 1.5rem; }
+}
+
+@media (max-width: 600px) {
+  .nav-right a:not(.nav-cta) { display: none; }
+}

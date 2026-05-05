@@ -1,0 +1,164 @@
+/* ─────────────────────────────────────────
+   HERO — full-viewport opening section
+   ───────────────────────────────────────── */
+
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8rem 3rem 5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle background grid */
+#hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.45;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* ─── INNER WRAPPER ───────────────────── */
+
+.hero-inner {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ─── EYEBROW ─────────────────────────── */
+
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: slideUp 0.7s ease 0.1s forwards;
+}
+
+.eyebrow-line {
+  width: 32px;
+  height: 1px;
+  background: var(--muted);
+}
+
+.eyebrow-text {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ─── HEADLINE ────────────────────────── */
+
+.hero-headline {
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  color: var(--black);
+  margin-bottom: 2.5rem;
+}
+
+/* Each line clips and reveals its inner span */
+.hero-headline .line {
+  display: block;
+  overflow: hidden;
+}
+
+.hero-headline .line-inner {
+  display: block;
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+.hero-headline .line:nth-child(1) .line-inner {
+  animation: lineReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+.hero-headline .line:nth-child(2) .line-inner {
+  animation: lineReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+}
+.hero-headline .line:nth-child(3) .line-inner {
+  animation: lineReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+}
+
+.hero-headline em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--muted);
+}
+
+/* ─── BOTTOM ROW ──────────────────────── */
+
+.hero-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: slideUp 0.8s ease 0.75s forwards;
+}
+
+.hero-sub {
+  font-size: 1rem;
+  color: var(--mid);
+  line-height: 1.7;
+  max-width: 420px;
+  font-weight: 400;
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+/* ─── SCROLL HINT ─────────────────────── */
+
+.scroll-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  opacity: 0;
+  animation: fadeIn 1s ease 1.2s forwards;
+}
+
+.scroll-hint span {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(var(--faint), transparent);
+  animation: scrollPulse 2s ease-in-out 1.5s infinite;
+}
+
+/* ─── RESPONSIVE ──────────────────────── */
+
+@media (max-width: 900px) {
+  #hero { padding: 7rem 1.5rem 5rem; }
+  .hero-bottom { flex-direction: column; align-items: flex-start; }
+  .hero-actions { align-items: flex-start; }
+}

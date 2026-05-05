@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LLM Prices Crashed 80%. What It Means for Your AI Business Model | Luca Giacomelli</title>
+  <meta name="description" content="LLM API prices fell 80% between 2024 and 2026. That sounds like great news. But the implications for gross margin, pricing power, and competitive strategy are far more complex." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/article.css" />
+  <link rel="stylesheet" href="../css/paywall.css" />
+  <style>
+    /* ── DEMO WIDGET ── */
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .demo-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--mid);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.01em;
+    }
+    .demo-group select,
+    .demo-group input[type="number"] {
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .demo-group select:focus,
+    .demo-group input[type="number"]:focus { border-color: var(--ink); }
+
+    .demo-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .demo-slider-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--ink);
+    }
+    .demo-slider-val {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink);
+      min-width: 60px;
+      text-align: right;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .result-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .result-card .r-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .result-card .r-value {
+      font-size: 1.6rem;
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1;
+    }
+    .result-card.highlight {
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+    .result-card.highlight .r-label { color: rgba(255,255,255,0.4); }
+    .result-card.highlight .r-value { color: #fff; }
+    .result-card.warn .r-value { color: #C2410C; }
+    .result-card.good .r-value { color: #15803D; }
+
+    .scenario-toggle {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+    }
+    .scenario-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--ink);
+      cursor: pointer;
+    }
+    .scenario-toggle label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .scenario-toggle span {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .chart-wrap {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .chart-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+    canvas { display: block; width: 100%; }
+
+    .model-prices-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 680px) {
+      .demo-grid { grid-template-columns: 1fr; }
+      .results-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body data-insight-id="llm-unit-economics">
+
+  <!-- NAV -->
+  <nav class="article-nav">
+    <div class="article-nav-left">
+      <a href="../insights.html" class="back-link">All insights</a>
+      <a href="../index.html" class="nav-site-name">Luca Giacomelli</a>
+    </div>
+    <div class="article-nav-right">
+      <a href="../index.html#contact">Let's talk</a>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <header class="article-header">
+    <div class="article-meta">
+      <span class="article-tag tag-economics">Economics</span>
+      <span class="article-date">May 2026</span>
+      <span class="article-read-time">8 min read + interactive demo</span>
+    </div>
+    <h1>LLM Prices Crashed 80% in Two Years. Here's What That Does to Your Business Model.</h1>
+    <p class="article-deck">
+      GPT-5 nano costs $0.05 per million tokens today. Two years ago the equivalent model
+      cost 5× more. That's extraordinary. But cheaper inference is not automatically good
+      news — depending on your business model, it might be the most dangerous trend in AI right now.
+    </p>
+  </header>
+  <!-- INTERACTIVE DEMO -->
+  <div class="demo-section">
+    <div class="demo-section-inner">
+      <div class="demo-label">⚡ Interactive Demo</div>
+      <h2>Calculate Your LLM Unit Economics</h2>
+      <p class="demo-intro">
+        Input your product parameters below to see how LLM inference costs affect your gross margin — and what happens if prices drop further.
+      </p>
+
+      <div class="demo-grid">
+        <div class="demo-group">
+          <label>Model</label>
+          <select id="model-select">
+            <option value="0.05,0.40">GPT-5 nano — $0.05 / $0.40 per 1M tokens</option>
+            <option value="0.30,1.00">Gemini 2.0 Flash — $0.30 / $1.00 per 1M tokens</option>
+            <option value="2.00,8.00" selected>GPT-4.1 — $2.00 / $8.00 per 1M tokens</option>
+            <option value="3.00,15.00">Claude Sonnet 4.5 — $3.00 / $15.00 per 1M tokens</option>
+            <option value="5.00,25.00">Claude Opus 4.6 — $5.00 / $25.00 per 1M tokens</option>
+            <option value="10.00,30.00">GPT-5 — $10.00 / $30.00 per 1M tokens</option>
+          </select>
+        </div>
+        <div class="demo-group">
+          <label>Monthly price per user ($)</label>
+          <input type="number" id="monthly-price" value="29" min="1" max="999" step="1" />
+        </div>
+        <div class="demo-group">
+          <label>Monthly Active Users</label>
+          <div class="demo-slider-row">
+            <input type="range" id="mau" min="100" max="100000" value="5000" step="100" />
+            <span class="demo-slider-val" id="mau-val">5,000</span>
+          </div>
+        </div>
+        <div class="demo-group">
+          <label>Queries per user per day</label>
+          <div class="demo-slider-row">
+            <input type="range" id="queries" min="1" max="50" value="5" step="1" />
+            <span class="demo-slider-val" id="queries-val">5</span>
+          </div>
+        </div>
+        <div class="demo-group">
+          <label>Avg input tokens per query</label>
+          <div class="demo-slider-row">
+            <input type="range" id="input-tokens" min="50" max="4000" value="500" step="50" />
+            <span class="demo-slider-val" id="input-tokens-val">500</span>
+          </div>
+        </div>
+        <div class="demo-group">
+          <label>Avg output tokens per query</label>
+          <div class="demo-slider-row">
+            <input type="range" id="output-tokens" min="50" max="2000" value="300" step="50" />
+            <span class="demo-slider-val" id="output-tokens-val">300</span>
+          </div>
+        </div>
+      </div>
+
+      <label class="scenario-toggle">
+        <input type="checkbox" id="price-drop-toggle" />
+        <div>
+          <label for="price-drop-toggle">Scenario: LLM prices drop another 50%</label><br/>
+          <span>See how further commoditisation impacts your margin</span>
+        </div>
+      </label>
+
+      <div class="results-grid">
+        <div class="result-card">
+          <div class="r-label">Monthly LLM Cost</div>
+          <div class="r-value" id="res-llm-cost">—</div>
+        </div>
+        <div class="result-card">
+          <div class="r-label">LLM Cost / User</div>
+          <div class="r-value" id="res-cost-per-user">—</div>
+        </div>
+        <div class="result-card">
+          <div class="r-label">LLM % of Revenue</div>
+          <div class="r-value" id="res-llm-pct">—</div>
+        </div>
+        <div class="result-card highlight">
+          <div class="r-label">Est. Gross Margin</div>
+          <div class="r-value" id="res-margin">—</div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Gross margin vs. monthly price per user</div>
+        <canvas id="margin-chart" height="200"></canvas>
+      </div>
+      <p class="model-prices-note">
+        * Estimates assume 20% additional COGS (infrastructure, support, etc.) beyond LLM costs.
+        Prices sourced from public model APIs as of May 2026. For illustration purposes only.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- BODY -->
+  <div class="article-body">
+
+    <p>
+      LLM API prices have dropped roughly <strong>80% between 2024 and 2026</strong>, declining
+      at 30–50% per year consistently. Today you can run GPT-5 nano at $0.05 per million input
+      tokens, or opt for a frontier model like Claude Opus 4.6 at $5/$25 input/output.
+      The price compression has been relentless, driven by hardware improvements, competition,
+      and the commoditisation of inference infrastructure.
+    </p>
+
+    <p>
+      For companies building AI-powered products, the instinct is to celebrate.
+      Lower input costs mean higher margins, right? Sometimes. But the relationship between
+      LLM costs, gross margin, and competitive positioning is more complicated — and most
+      founders I speak to haven't modelled it properly.
+    </p>
+
+    <h2>The Unit Economics Framework for LLM Products</h2>
+
+    <p>
+      In any software business, gross margin is the foundation. It tells you how much of
+      each revenue dollar remains after paying for the direct costs of delivering the service.
+      For traditional SaaS, those costs are low — hosting and infrastructure rarely exceed
+      10–15% of revenue. Gross margins of 70–80% are standard.
+    </p>
+
+    <p>
+      LLM-powered products break this model. <strong>Every user interaction has a variable
+      cost</strong> tied directly to usage: tokens in, tokens out, model selected.
+      As your product scales, your COGS scales with it — and unlike a server cost that amortises
+      across users, each additional query costs real money.
+    </p>
+
+    <div class="framework-box">
+      <div class="framework-label">MBA Framework — Unit Economics</div>
+      <h3>The Key Metrics for LLM Products</h3>
+      <ul>
+        <li><strong>LLM Cost per User (monthly):</strong> Avg queries/day × avg tokens/query × days × token price. This is your LLM-driven COGS per user.</li>
+        <li><strong>LLM as % of Revenue:</strong> If your LLM cost per user exceeds ~20% of ARPU, you have a structural margin problem as you scale.</li>
+        <li><strong>Gross Margin:</strong> Revenue − (LLM costs + infrastructure + support). Best-in-class LLM products target 60–70%. Below 50% is a warning sign.</li>
+        <li><strong>Break-even ARPU:</strong> The minimum you can charge per user before LLM costs alone make the unit unprofitable. This sets your pricing floor.</li>
+      </ul>
+    </div>
+
+    <h2>The Commoditisation Paradox</h2>
+
+    <p>
+      Here is the strategic trap embedded in falling LLM prices. When inference gets cheaper,
+      two things happen simultaneously. Your costs go down — good. But so does the cost
+      for any competitor to replicate your product — bad. <strong>Lower inference costs
+      reduce barriers to entry.</strong>
+    </p>
+
+    <p>
+      If your moat is "we use GPT-5 to do X," that moat is already gone. Any well-funded
+      competitor can run the same model, at the same cost, tomorrow. The companies that will
+      win on unit economics are those building advantages that <em>don't</em> scale linearly
+      with inference costs: proprietary data, fine-tuned models on unique datasets, deep
+      workflow integration that creates switching costs, and network effects.
+    </p>
+
+    <div class="pull-quote">
+      <p>"Cheaper inference is a commodity. What you build on top of it — your data, your workflow, your compounding advantages — is what determines whether the margin flows to you or to your competitors."</p>
+    </div>
+
+    <h2>The Three Strategic Responses</h2>
+
+    <p>
+      When LLM costs fall, every AI product company faces a strategic choice about what to
+      do with the savings:
+    </p>
+
+    <p>
+      <strong>1. Pass savings to customers (compete on price).</strong> This makes sense
+      if you're in a commoditised market where price is the primary differentiator and you
+      have scale advantages. Dangerous if competitors can match your pricing — you race to zero.
+    </p>
+
+    <p>
+      <strong>2. Retain savings (expand margin).</strong> Rational if customers aren't price-sensitive
+      and your product has strong retention. The risk: a competitor enters at lower price
+      and steals your users before you can defend.
+    </p>
+
+    <p>
+      <strong>3. Re-invest savings in product quality.</strong> Use the cost reduction to
+      run better models, more queries, or richer features at the same price point — increasing
+      your quality gap without touching margins. This is the most strategically sound
+      approach if you're building for defensibility.
+    </p>
+
+  </div>
+
+  <!-- BODY CONTINUED -->
+  <div class="article-body">
+
+    <h2>What to Do With This Model</h2>
+
+    <p>
+      The calculator above is a simplified view, but it surfaces the critical variables
+      fast. If your LLM costs are already above 30% of revenue at current prices,
+      you have a margin problem that cheaper models won't solve — you have a pricing
+      or usage problem. If your costs are sub-10%, you have strategic room to either
+      expand your model usage, improve product quality, or defend against price competition.
+    </p>
+
+    <p>
+      The most important number to watch is not the absolute cost, but the
+      <strong>trajectory</strong>. Model LLM costs as a percentage of revenue at 2×,
+      5×, and 10× your current MAU. If that percentage rises as you scale, you don't
+      have a scalable business — you have a cost structure that gets worse with success.
+    </p>
+
+    <div class="takeaways">
+      <div class="takeaways-label">Key Takeaways</div>
+      <ul>
+        <li>LLM API prices fell ~80% from 2024 to 2026 — but falling COGS also reduces barriers to entry for competitors, compressing your pricing power.</li>
+        <li>LLM-powered products must track cost-per-user, not just total cost — and model how that number scales with usage growth.</li>
+        <li>A sustainable AI product targets LLM costs below 20% of revenue. Above 30% is a structural warning sign.</li>
+        <li>The strategic response to falling inference costs is not to pass all savings on — it's to reinvest in the product advantages that can't be commoditised: proprietary data, fine-tuning, and workflow depth.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- SOURCES -->
+  <div class="article-sources">
+    <p>Sources</p>
+    <ol>
+      <li><a href="https://zenvanriel.com/ai-engineer-blog/llm-api-cost-comparison-2026/" target="_blank">LLM API Cost Comparison 2026: Complete Pricing Guide for Production AI — zenvanriel.com</a></li>
+      <li><a href="https://benchlm.ai/blog/posts/llm-pricing-2026" target="_blank">LLM API Pricing Comparison 2026: Every Major Model, Ranked by Cost — BenchLM.ai</a></li>
+      <li><a href="https://www.cloudidr.com/blog/llm-pricing-comparison-2026" target="_blank">Complete LLM Pricing Comparison 2026: We Analyzed 105 Models — CloudIDR</a></li>
+      <li><a href="https://featherless.ai/blog/llm-api-pricing-comparison-2026-complete-guide-inference-costs" target="_blank">LLM API Pricing Comparison 2026: Complete Guide to Inference Costs — Featherless AI</a></li>
+      <li>Model prices in the interactive calculator are sourced from public APIs as of May 2026 and are for illustrative purposes only. Verify current pricing before making business decisions.</li>
+    </ol>
+  </div>
+
+  <!-- FOOTER CTA -->
+  <div class="article-footer-cta">
+    <p>Want to model the unit economics of your specific AI product?</p>
+    <a href="../index.html#contact" class="btn-primary">Let's talk →</a>
+  </div>
+
+  <!-- SITE FOOTER -->
+  <footer style="background:var(--black);border-top:1px solid rgba(255,255,255,0.06);padding:1.5rem 3rem;">
+    <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.25);">© 2026 Luca Giacomelli · AI Advisor &amp; Architect</p>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="../index.html#insights" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Insights</a>
+        <a href="../index.html#contact" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Contact</a>
+        <a href="https://www.linkedin.com/in/luca-giacomelli-20052a136/" target="_blank" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script>
+    const OTHER_COGS_PCT = 0.20;
+
+    function getInputs() {
+      const [inputPrice, outputPrice] = document.getElementById('model-select').value.split(',').map(Number);
+      const pricePerUser  = parseFloat(document.getElementById('monthly-price').value) || 0;
+      const mau           = parseInt(document.getElementById('mau').value);
+      const queriesPerDay = parseInt(document.getElementById('queries').value);
+      const inputTokens   = parseInt(document.getElementById('input-tokens').value);
+      const outputTokens  = parseInt(document.getElementById('output-tokens').value);
+      const priceDrop     = document.getElementById('price-drop-toggle').checked;
+      const multiplier    = priceDrop ? 0.5 : 1;
+      return { inputPrice: inputPrice * multiplier, outputPrice: outputPrice * multiplier,
+               pricePerUser, mau, queriesPerDay, inputTokens, outputTokens };
+    }
+
+    function calcLLMCostPerUser(inp) {
+      const monthlyQueries = inp.queriesPerDay * 30;
+      const inputCost  = (inp.inputTokens  / 1_000_000) * inp.inputPrice  * monthlyQueries;
+      const outputCost = (inp.outputTokens / 1_000_000) * inp.outputPrice * monthlyQueries;
+      return inputCost + outputCost;
+    }
+
+    function calcMargin(pricePerUser, llmCostPerUser) {
+      if (pricePerUser <= 0) return null;
+      const otherCogs = pricePerUser * OTHER_COGS_PCT;
+      const totalCogs = llmCostPerUser + otherCogs;
+      return ((pricePerUser - totalCogs) / pricePerUser) * 100;
+    }
+
+    function fmt(n, prefix = '$') {
+      if (n >= 1000000) return prefix + (n / 1000000).toFixed(1) + 'M';
+      if (n >= 1000)    return prefix + (n / 1000).toFixed(1) + 'K';
+      return prefix + n.toFixed(2);
+    }
+
+    let chart;
+
+    function update() {
+      const inp = getInputs();
+      const llmCostPerUser   = calcLLMCostPerUser(inp);
+      const totalLLMCost     = llmCostPerUser * inp.mau;
+      const totalRevenue     = inp.pricePerUser * inp.mau;
+      const llmPct           = totalRevenue > 0 ? (totalLLMCost / totalRevenue) * 100 : 0;
+      const margin           = calcMargin(inp.pricePerUser, llmCostPerUser);
+
+      document.getElementById('res-llm-cost').textContent     = fmt(totalLLMCost);
+      document.getElementById('res-cost-per-user').textContent = fmt(llmCostPerUser);
+      document.getElementById('res-llm-pct').textContent      = llmPct.toFixed(1) + '%';
+      document.getElementById('res-margin').textContent       = margin !== null ? Math.round(margin) + '%' : '—';
+
+      const marginCard = document.getElementById('res-margin').parentElement;
+      marginCard.className = 'result-card highlight';
+      const llmPctCard = document.getElementById('res-llm-pct').parentElement;
+      llmPctCard.className = llmPct > 30 ? 'result-card warn' : llmPct < 15 ? 'result-card good' : 'result-card';
+
+      // Chart: margin vs. price points
+      const prices = [];
+      const margins = [];
+      const maxP = Math.max(inp.pricePerUser * 3, 100);
+      for (let p = 1; p <= maxP; p += maxP / 40) {
+        prices.push(p.toFixed(0));
+        margins.push(Math.max(-100, calcMargin(p, llmCostPerUser) ?? -100));
+      }
+
+      if (chart) {
+        chart.data.labels = prices;
+        chart.data.datasets[0].data = margins;
+        chart.data.datasets[1].data = prices.map(() => 0);
+        chart.data.datasets[2].data = prices.map(() => 70);
+        chart.update('none');
+      } else {
+        const ctx = document.getElementById('margin-chart').getContext('2d');
+        chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: prices,
+            datasets: [
+              {
+                label: 'Gross Margin (%)',
+                data: margins,
+                borderColor: '#111111',
+                backgroundColor: 'rgba(17,17,17,0.06)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                borderWidth: 2,
+              },
+              {
+                label: 'Break-even (0%)',
+                data: prices.map(() => 0),
+                borderColor: '#E24B4A',
+                borderDash: [4, 4],
+                pointRadius: 0,
+                borderWidth: 1.5,
+                fill: false,
+              },
+              {
+                label: 'SaaS benchmark (70%)',
+                data: prices.map(() => 70),
+                borderColor: '#15803D',
+                borderDash: [4, 4],
+                pointRadius: 0,
+                borderWidth: 1.5,
+                fill: false,
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { font: { size: 11, family: 'Inter' }, color: '#888', boxWidth: 20 }
+              },
+              tooltip: {
+                callbacks: {
+                  label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: { font: { size: 10, family: 'Inter' }, color: '#aaa',
+                         callback: (v, i) => i % 8 === 0 ? '$' + prices[i] : '' },
+                grid: { color: 'rgba(0,0,0,0.05)' }
+              },
+              y: {
+                ticks: { font: { size: 10, family: 'Inter' }, color: '#aaa',
+                         callback: v => v + '%' },
+                grid: { color: 'rgba(0,0,0,0.05)' }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Slider display updates
+    ['mau','queries','input-tokens','output-tokens'].forEach(id => {
+      const el = document.getElementById(id);
+      const val = document.getElementById(id + '-val');
+      el.addEventListener('input', () => {
+        val.textContent = parseInt(el.value).toLocaleString();
+        update();
+      });
+    });
+
+    document.getElementById('model-select').addEventListener('change', update);
+    document.getElementById('monthly-price').addEventListener('input', update);
+    document.getElementById('price-drop-toggle').addEventListener('change', update);
+
+    update();
+  </script>
+
+  <script src="../data/insights.js"></script>
+  <script src="../js/subscription.js"></script>
+  <script src="../js/paywall.js"></script>
+</body>
+</html>

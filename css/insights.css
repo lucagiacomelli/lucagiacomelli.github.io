@@ -1,0 +1,158 @@
+/* ─────────────────────────────────────────
+   INSIGHTS — article cards section
+   ───────────────────────────────────────── */
+
+#insights {
+  padding: 8rem 3rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg-soft);
+}
+
+.insights-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ─── SECTION HEADER ──────────────────── */
+
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 4rem;
+}
+
+.section-header h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+
+.view-all {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--blue);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: gap 0.2s;
+  white-space: nowrap;
+  padding-bottom: 0.25rem; /* align with baseline of h2 */
+}
+.view-all:hover { gap: 0.6rem; }
+
+/* ─── CARD GRID ───────────────────────── */
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+/* ─── INDIVIDUAL CARD ─────────────────── */
+
+.insight-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  text-decoration: none;
+  display: block;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform  0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s;
+}
+
+/* Animated arrow in bottom-right corner */
+.insight-card::after {
+  content: '→';
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  font-size: 1.1rem;
+  color: var(--faint);
+  transition: color 0.2s, transform 0.2s;
+}
+
+.insight-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.07);
+}
+.insight-card:hover::after {
+  color: var(--blue);
+  transform: translate(3px, -3px);
+}
+
+/* ─── TAG PILLS ───────────────────────── */
+
+.insight-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 100px;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+
+.tag-strategy     { background: #F0FDF4; color: #15803D; }
+.tag-economics    { background: #FFF7ED; color: #C2410C; }
+.tag-architecture { background: #EFF6FF; color: #1D4ED8; }
+.tag-football     { background: #1C1C1C; color: #FFFFFF; }
+
+/* ─── CARD CONTENT ────────────────────── */
+
+.insight-card h3 {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.75rem;
+  padding-right: 1.5rem; /* keep clear of the arrow */
+}
+
+.insight-card p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 2.5rem;
+}
+
+/* ─── CARD FOOTER ─────────────────────── */
+
+.insight-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.demo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 100px;
+}
+
+.coming-soon {
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+
+/* ─── RESPONSIVE ──────────────────────── */
+
+@media (max-width: 900px) {
+  #insights { padding: 5rem 1.5rem; }
+  .insights-grid { grid-template-columns: 1fr; }
+  .section-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+}

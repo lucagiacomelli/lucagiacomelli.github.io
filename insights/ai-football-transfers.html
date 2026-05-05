@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The €80M Gamble Is Now a Science — How AI Is Rewriting Football's Transfer Market | Luca Giacomelli</title>
+  <meta name="description" content="Football transfers are a €6B+ market built on gut instinct and highlight reels. AI scouting, player valuation models, and performance prediction are changing that. Here's how." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/article.css" />
+  <link rel="stylesheet" href="../css/paywall.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    /* ── ANIMATED PITCH HEADER ── */
+    .article-header { position: relative; overflow: hidden; }
+    @keyframes pitchPulse {
+      0%,100% { opacity: 0.04; }
+      50%     { opacity: 0.10; }
+    }
+    .pitch-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        repeating-linear-gradient(90deg, transparent, transparent 49%, rgba(29,78,216,.06) 49%, rgba(29,78,216,.06) 51%),
+        repeating-linear-gradient(0deg,   transparent, transparent 49%, rgba(29,78,216,.04) 49%, rgba(29,78,216,.04) 51%);
+      background-size: 60px 60px;
+      animation: pitchPulse 6s ease-in-out infinite;
+    }
+
+    /* ── STAT COUNTERS ── */
+    .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.25rem; margin: 2.5rem 0; }
+    .stat-card { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; text-align: center; }
+    .stat-number { font-size: 2.25rem; font-weight: 300; letter-spacing: -0.04em; color: var(--ink); display: block; line-height: 1; margin-bottom: 0.4rem; }
+    .stat-label  { font-size: 0.75rem; color: var(--muted); line-height: 1.45; }
+
+    /* ── DATA METRICS TABLE ── */
+    .metrics-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 0.75rem; margin: 2rem 0; }
+    .metric-row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.9rem 1rem; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; }
+    .metric-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .metric-body h4 { font-size: 0.8rem; font-weight: 600; color: var(--ink); margin-bottom: 0.2rem; }
+    .metric-body p  { font-size: 0.73rem; color: var(--muted); margin: 0; line-height: 1.4; }
+
+    /* ── DEMO LAYOUT ── */
+    .transfer-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start; }
+    .radar-wrap { position: relative; max-width: 320px; margin: 0 auto; }
+
+    /* ── DEMO CONTROLS ── */
+    .demo-controls { display: flex; flex-direction: column; gap: 1rem; }
+    .ctrl-row  { display: flex; flex-direction: column; gap: 0.35rem; }
+    .ctrl-top  { display: flex; justify-content: space-between; align-items: baseline; }
+    .ctrl-top label { font-size: 0.8rem; font-weight: 500; color: var(--ink); }
+    .ctrl-top span  { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+    .ctrl-row input[type="range"] { width: 100%; accent-color: var(--ink); cursor: pointer; }
+
+    /* ── POSITION SELECTOR ── */
+    .pos-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+    .pos-btn {
+      font-size: 0.75rem; font-weight: 500; padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border); border-radius: 100px;
+      background: transparent; color: var(--mid); cursor: pointer; transition: all 0.2s;
+    }
+    .pos-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .pos-label { font-size: 0.8rem; font-weight: 600; color: var(--ink); margin-bottom: 0.5rem; display: block; }
+
+    /* ── VALUE VERDICT ── */
+    .value-box { background: var(--black); border-radius: 14px; padding: 1.5rem; margin-top: 0.5rem; }
+    .vb-head { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.75rem; }
+    .vb-price { font-size: 2.5rem; font-weight: 300; letter-spacing: -0.04em; color: #fff; line-height: 1; margin-bottom: 0.3rem; transition: color 0.4s; }
+    .vb-verdict { font-size: 0.8rem; font-weight: 600; padding: 0.3rem 0.85rem; border-radius: 100px; display: inline-block; margin-bottom: 0.75rem; transition: all 0.4s; }
+    .vb-note { font-size: 0.77rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+    /* ── ALPHA SCORE BAR ── */
+    .alpha-row { margin-top: 0.75rem; }
+    .alpha-lbl { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 0.35rem; }
+    .alpha-bar-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 100px; overflow: hidden; }
+    .alpha-bar-fill  { height: 100%; border-radius: 100px; transition: width 0.7s cubic-bezier(.4,0,.2,1), background 0.4s; }
+
+    /* ── CLUBS TIMELINE ── */
+    .clubs-timeline { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin: 2rem 0; }
+    .club-card { border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
+    .club-card .club-year { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 0.3rem; }
+    .club-card .club-name { font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 0.25rem; }
+    .club-card .club-desc { font-size: 0.73rem; color: var(--muted); line-height: 1.4; }
+
+    @keyframes radarDraw { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+    .radar-wrap canvas { animation: radarDraw 0.8s ease forwards; }
+
+    @media (max-width: 700px) {
+      .transfer-demo, .metrics-grid, .clubs-timeline { grid-template-columns: 1fr; }
+      .stat-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-insight-id="ai-football-transfers">
+
+  <nav class="article-nav">
+    <div class="article-nav-left">
+      <a href="../insights.html" class="back-link">All insights</a>
+      <a href="../index.html" class="nav-site-name">Luca Giacomelli</a>
+    </div>
+    <div class="article-nav-right"><a href="../index.html#contact">Let's talk</a></div>
+  </nav>
+
+  <header class="article-header">
+    <div class="pitch-bg"></div>
+    <div class="article-meta">
+      <span class="article-tag tag-football">Football × AI</span>
+      <span class="article-date">May 2026</span>
+      <span class="article-read-time">9 min read</span>
+    </div>
+    <h1>The €80M Gamble Is Now a Science — How AI Scouting Is Rewriting the Transfer Market</h1>
+    <p class="article-deck">
+      In 2011, Manchester City paid €38M for Stefan Savić. He played 13 games and was sold
+      a year later. The transfer market has always been football's most expensive coin toss.
+      AI scouting, player valuation models, and performance prediction are turning that coin toss
+      into a repeatable process. Not perfect — but enough to matter enormously.
+    </p>
+  </header>
+  <!-- ── INTERACTIVE DEMO ── -->
+  <div class="demo-section">
+    <div class="demo-section-inner">
+      <div class="demo-label">Interactive Demo</div>
+      <h2>Player Value Estimator</h2>
+      <p class="demo-intro">Rate a player across six key performance dimensions. The model estimates market value and an "AI alpha score" — how over or undervalued the player likely is.</p>
+
+      <div class="transfer-demo">
+
+        <div>
+          <span class="pos-label">Position</span>
+          <div class="pos-group">
+            <button class="pos-btn active" data-pos="cm">Central Mid</button>
+            <button class="pos-btn" data-pos="cf">Centre Forward</button>
+            <button class="pos-btn" data-pos="cb">Centre Back</button>
+            <button class="pos-btn" data-pos="winger">Winger</button>
+          </div>
+          <div class="radar-wrap">
+            <canvas id="radar-chart"></canvas>
+          </div>
+        </div>
+
+        <div>
+          <div class="demo-controls" id="demo-controls"></div>
+
+          <div class="value-box">
+            <div class="vb-head">⚡ AI Model Output</div>
+            <div class="vb-price" id="vb-price">€0M</div>
+            <span class="vb-verdict" id="vb-verdict">—</span>
+            <p class="vb-note" id="vb-note">Adjust the player profile to see the model's assessment.</p>
+            <div class="alpha-row">
+              <div class="alpha-lbl">Alpha Score (market mispricing)</div>
+              <div class="alpha-bar-track">
+                <div class="alpha-bar-fill" id="alpha-fill" style="width:50%;background:#4ADE80;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="article-body">
+
+    <p>
+      The global football transfer market processed <strong>over €6.5 billion</strong> in fees
+      in 2024/25. Behind each transaction is a decision made under conditions of radical uncertainty:
+      will this player perform in a different league, a different style of play, a different city,
+      under a different manager? Traditional scouting — a network of talent spotters watching
+      matches, followed by video analysis and gut instinct — has a poor track record at the top end
+      of the market. Studies suggest fewer than 40% of transfers over €40M are considered
+      successful three years later.
+    </p>
+
+    <p>
+      The data revolution in football didn't start with AI. It started with event data —
+      <strong>Opta, StatsBomb, and Wyscout</strong> began digitising every touch, pass, shot,
+      and press in professional football in the 2000s. A single match now generates over
+      2,000 tracked events per team. Today, the leading clubs sit on years of player tracking
+      data across every professional league on earth — and they have the models to read it.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <span class="stat-number" data-target="6500" data-prefix="€" data-suffix="M">0</span>
+        <span class="stat-label">global transfer market value, 2024/25 season</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" data-target="38" data-prefix="" data-suffix="%">0</span>
+        <span class="stat-label">of transfers above €40M rated successful 3 years later by clubs</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" data-target="2000" data-prefix="" data-suffix="+">0</span>
+        <span class="stat-label">tracked events per team per match in modern event data systems</span>
+      </div>
+    </div>
+
+    <h2>What AI Actually Measures</h2>
+
+    <p>
+      The move from raw event data to player valuation models required a new vocabulary.
+      Traditional stats — goals, assists, pass completion — were designed for newspaper
+      scorecards. Modern football data science uses metrics that better capture actual
+      contribution to winning.
+    </p>
+
+    <div class="metrics-grid">
+      <div class="metric-row">
+        <span class="metric-icon">🎯</span>
+        <div class="metric-body"><h4>Expected Threat (xT)</h4><p>Measures how much a player improves their team's probability of scoring with each action — not just shots.</p></div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-icon">📐</span>
+        <div class="metric-body"><h4>VAEP (Value Added per Event)</h4><p>Assigns a win-probability value to every touch, attributing positive and negative contributions across all players.</p></div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-icon">🏃</span>
+        <div class="metric-body"><h4>Progressive carries</h4><p>Carries that advance the ball at least 10m toward goal — a key indicator of ball-carrying value ignored by assists stats.</p></div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-icon">🔥</span>
+        <div class="metric-body"><h4>Pressing intensity</h4><p>PPDA (Passes Per Defensive Action) measures how aggressively a player disrupts opposition build-up.</p></div>
+      </div>
+    </div>
+
+    <div class="framework-box">
+      <div class="framework-label">MBA Framework</div>
+      <h3>Efficient Market Hypothesis — and How to Generate Alpha</h3>
+      <ul>
+        <li><strong>The market inefficiency thesis:</strong> Transfer fees are set by perceived value, driven by highlights, nationality biases, agent relationships, and recency effects. AI models find players whose true statistical contribution is significantly above what the market currently prices them at.</li>
+        <li><strong>Brentford's "Moneyball" model:</strong> By 2021, Brentford had assembled a squad valued at a fraction of their rivals using data-driven scouting. The model: buy statistically exceptional players from underexposed leagues before larger clubs notice. Sell when market price catches up to model value.</li>
+        <li><strong>The alpha decay problem:</strong> As more clubs adopt the same models, inefficiencies close. The new edge is proprietary data (biomechanical tracking, psychological profiling) or better models on the same data — not just access to event data everyone already has.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="article-body">
+
+    <h2>The Pioneers — Clubs That Moved First</h2>
+
+    <div class="clubs-timeline">
+      <div class="club-card">
+        <div class="club-year">2012</div>
+        <div class="club-name">Brentford FC</div>
+        <div class="club-desc">Built Championship-to-Premier League squad on data analytics. Ivan Toney: £10M from League One. Sold at premium.</div>
+      </div>
+      <div class="club-card">
+        <div class="club-year">2016</div>
+        <div class="club-name">Brighton &amp; Hove</div>
+        <div class="club-desc">Tony Bloom's StatsBomb investment. Systematic undervalued player identification. European football on a Championship budget.</div>
+      </div>
+      <div class="club-card">
+        <div class="club-year">2019</div>
+        <div class="club-name">Liverpool FC</div>
+        <div class="club-desc">Deep integration of StatsBomb tracking data into recruitment. Díaz, Jota, Robertson — all data-flagged before market noticed.</div>
+      </div>
+      <div class="club-card">
+        <div class="club-year">2024</div>
+        <div class="club-name">The field</div>
+        <div class="club-desc">Every top-20 club now has a data science recruitment team. The edge is no longer having the data — it's having better models.</div>
+      </div>
+    </div>
+
+    <div class="pull-quote">
+      <p>"Five years ago, having event data was the edge. Today, everyone has event data. The edge is the model, the proprietary signals, and the speed of decision-making."</p>
+    </div>
+
+    <p>
+      The next frontier is <strong>multimodal scouting AI</strong>: models that ingest video,
+      GPS tracking, biometric load, and psychological assessments simultaneously — generating
+      a holistic player profile that no human scout could replicate at scale. Startups like
+      Soccerment, Skillcorner, and DRIBLAB are already selling components of this stack
+      to clubs. Within five years, AI agents will autonomously scan every professional
+      league in the world, flagging undervalued players before any human scout has
+      watched a single match.
+    </p>
+
+    <div class="takeaways">
+      <div class="takeaways-label">Key Takeaways</div>
+      <ul>
+        <li>The transfer market is a €6.5B+ market with historically poor decision-making. Fewer than 40% of major transfers are considered successful — a massive inefficiency for AI to exploit.</li>
+        <li>AI scouting uses metrics like xT, VAEP, and PPDA that better predict winning contribution than traditional stats — enabling clubs to find underpriced players before the market catches up.</li>
+        <li>The Efficient Market framework explains both the opportunity and its limits: as more clubs adopt the same models, the edge shifts to proprietary data and better algorithms, not data access.</li>
+        <li>The frontier is multimodal AI: video, GPS, biometrics, and psychology combined into a unified player valuation model that operates at global scale, continuously.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="article-sources">
+    <p>Sources</p>
+    <ol>
+      <li>FIFA Global Transfer Market Report 2025 — Transfer volume and fee analysis.</li>
+      <li>StatsBomb, "The Data-Driven Club" — Case studies in recruitment analytics, 2024.</li>
+      <li>Anderson, C. &amp; Sally, D., "The Numbers Game: Why Everything You Know About Football is Wrong," 2013.</li>
+      <li>Deloitte Sports Business Group, "The Transfer Market Report," 2024.</li>
+      <li>Pappalardo, L. et al., "A public data set of spatio-temporal match events in soccer leagues," <em>Nature Scientific Data</em>, 2019.</li>
+    </ol>
+  </div>
+
+  <div class="article-footer-cta">
+    <p>Thinking about data-driven decision making in sports or beyond? Let's talk.</p>
+    <a href="../index.html#contact" class="btn-primary">Let's talk →</a>
+  </div>
+
+  <footer style="background:var(--black);border-top:1px solid rgba(255,255,255,0.06);padding:1.5rem 3rem;">
+    <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.25);">© 2026 Luca Giacomelli · AI Advisor &amp; Architect</p>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="../insights.html" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Insights</a>
+        <a href="../index.html#contact" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ── ANIMATED COUNTERS ── */
+    function animCount(el, target, prefix, suffix, dur) {
+      let s = null;
+      (function step(ts) {
+        if (!s) s = ts;
+        const p = Math.min((ts - s) / dur, 1);
+        const v = Math.round((1 - Math.pow(1 - p, 3)) * target);
+        el.textContent = prefix + v.toLocaleString() + suffix;
+        if (p < 1) requestAnimationFrame(step);
+      })(performance.now());
+    }
+    const obs = new IntersectionObserver(es => {
+      es.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        animCount(el, +el.dataset.target, el.dataset.prefix || '', el.dataset.suffix || '', 1400);
+        obs.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.stat-number').forEach(el => obs.observe(el));
+
+    /* ── POSITION PROFILES ── */
+    const LABELS = ['Goals/Assists','Pressing','Ball Carrying','Passing','Aerial Duels','Positioning'];
+    const POS_WEIGHTS = {
+      cm:     [0.6, 1.0, 0.9, 1.1, 0.7, 1.0],
+      cf:     [1.4, 0.8, 0.9, 0.7, 1.2, 1.1],
+      cb:     [0.4, 0.9, 0.7, 1.0, 1.4, 1.2],
+      winger: [1.1, 0.9, 1.3, 0.8, 0.6, 0.9],
+    };
+    const BASE_VALUES = { cm: 18, cf: 28, cb: 16, winger: 24 };
+
+    let currentPos = 'cm';
+    let sliderVals = [50, 50, 50, 50, 50, 50];
+    let radarChart;
+
+    /* ── BUILD SLIDERS ── */
+    function buildControls() {
+      const wrap = document.getElementById('demo-controls');
+      wrap.innerHTML = LABELS.map((lbl, i) => `
+        <div class="ctrl-row">
+          <div class="ctrl-top">
+            <label>${lbl}</label>
+            <span id="sv-${i}">${sliderVals[i]}</span>
+          </div>
+          <input type="range" id="sl-${i}" min="1" max="100" value="${sliderVals[i]}" data-idx="${i}" />
+        </div>`).join('');
+      wrap.querySelectorAll('input[type="range"]').forEach(inp => {
+        inp.addEventListener('input', () => {
+          const idx = +inp.dataset.idx;
+          sliderVals[idx] = +inp.value;
+          document.getElementById('sv-' + idx).textContent = inp.value;
+          updateAll();
+        });
+      });
+    }
+
+    /* ── BUILD / UPDATE RADAR ── */
+    function buildRadar() {
+      if (radarChart) { radarChart.destroy(); }
+      const ctx = document.getElementById('radar-chart').getContext('2d');
+      radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: LABELS,
+          datasets: [{
+            label: 'Player Profile',
+            data: sliderVals,
+            backgroundColor: 'rgba(29,78,216,0.15)',
+            borderColor: '#1D4ED8',
+            borderWidth: 2,
+            pointBackgroundColor: '#1D4ED8',
+            pointRadius: 4,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: true,
+          animation: { duration: 600, easing: 'easeOutQuart' },
+          plugins: { legend: { display: false } },
+          scales: {
+            r: {
+              min: 0, max: 100,
+              ticks: { display: false, stepSize: 25 },
+              grid: { color: '#E2E8F0' },
+              pointLabels: { font: { family: 'Inter', size: 10 }, color: '#64748B' },
+            }
+          }
+        }
+      });
+    }
+
+    function updateRadar() {
+      if (radarChart) {
+        radarChart.data.datasets[0].data = sliderVals;
+        radarChart.update('none');
+      }
+    }
+
+    /* ── VALUE ESTIMATE ── */
+    function calcValue() {
+      const weights = POS_WEIGHTS[currentPos];
+      const score = sliderVals.reduce((sum, v, i) => sum + v * weights[i], 0) / 6;
+      const base  = BASE_VALUES[currentPos];
+      const value = Math.round(base * (score / 50) * 10) / 10;
+      // Alpha: how far above a "market-average" player at this score
+      const marketExpected = base * 0.9;
+      const alpha = Math.round(((value - marketExpected) / marketExpected) * 100);
+      return { value, alpha, score };
+    }
+
+    function updateAll() {
+      updateRadar();
+      const { value, alpha, score } = calcValue();
+      document.getElementById('vb-price').textContent = '€' + value.toFixed(1) + 'M';
+      const verdict = document.getElementById('vb-verdict');
+      const fill    = document.getElementById('alpha-fill');
+      const alphaW  = Math.min(Math.max(50 + alpha / 2, 5), 95);
+      if (alpha > 20) {
+        verdict.textContent = '🟢 Undervalued — Buy Signal';
+        verdict.style.cssText = 'background:#DCFCE7;color:#15803D';
+        fill.style.width = alphaW + '%'; fill.style.background = '#4ADE80';
+        document.getElementById('vb-note').textContent = `Model suggests market price is ~${Math.abs(alpha)}% below statistical contribution. High alpha opportunity.`;
+      } else if (alpha < -15) {
+        verdict.textContent = '🔴 Overvalued — Avoid';
+        verdict.style.cssText = 'background:#FEE2E2;color:#991B1B';
+        fill.style.width = alphaW + '%'; fill.style.background = '#EF4444';
+        document.getElementById('vb-note').textContent = `Statistical profile doesn't justify current market pricing. ${Math.abs(alpha)}% premium over model value.`;
+      } else {
+        verdict.textContent = '🟡 Fairly Priced';
+        verdict.style.cssText = 'background:#FEF3C7;color:#92400E';
+        fill.style.width = '50%'; fill.style.background = '#F59E0B';
+        document.getElementById('vb-note').textContent = 'Player is priced in line with statistical contribution. Limited alpha opportunity at current valuation.';
+      }
+    }
+
+    /* ── POSITION BUTTONS ── */
+    document.querySelectorAll('.pos-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPos = btn.dataset.pos;
+        buildRadar();
+        updateAll();
+      });
+    });
+
+    buildControls();
+    buildRadar();
+    updateAll();
+  </script>
+
+  <script src="../data/insights.js"></script>
+  <script src="../js/subscription.js"></script>
+  <script src="../js/paywall.js"></script>
+</body>
+</html>

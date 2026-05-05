@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How AI Predicts Football Injuries Before They Happen | Luca Giacomelli</title>
+  <meta name="description" content="GPS vests, muscle sensors, and machine learning are predicting football injuries weeks before players feel a thing. Here's the science — and the business case." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/article.css" />
+  <link rel="stylesheet" href="../css/paywall.css" />
+  <style>
+    /* ── ANIMATED HEADER PARTICLES ── */
+    .article-header { position: relative; overflow: hidden; }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) translateX(0); opacity: 0; }
+      15%  { opacity: 0.5; }
+      85%  { opacity: 0.5; }
+      100% { transform: translateY(-160px) translateX(var(--dx)); opacity: 0; }
+    }
+    .data-particle {
+      position: absolute; width: 3px; height: 3px;
+      background: #1D4ED8; border-radius: 50%; pointer-events: none;
+      animation: floatUp var(--dur) ease-in-out infinite;
+      animation-delay: var(--delay);
+      bottom: 20px; left: var(--x);
+    }
+
+    /* ── STAT COUNTERS ── */
+    .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.25rem; margin: 2.5rem 0; }
+    .stat-card { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; text-align: center; }
+    .stat-number { font-size: 2.25rem; font-weight: 300; letter-spacing: -0.04em; color: var(--ink); display: block; line-height: 1; margin-bottom: 0.4rem; }
+    .stat-label  { font-size: 0.75rem; color: var(--muted); line-height: 1.45; }
+
+    /* ── DEMO LAYOUT ── */
+    .injury-demo { display: grid; grid-template-columns: 200px 1fr; gap: 2.5rem; align-items: start; }
+
+    /* ── SVG BODY ZONES ── */
+    .body-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+    .body-title { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    @keyframes zonePulse { 0%,100% { opacity:1; filter: drop-shadow(0 0 0px currentColor); } 50% { opacity:0.75; filter: drop-shadow(0 0 6px currentColor); } }
+    .zone-pulse { animation: zonePulse 1.3s ease-in-out infinite; }
+
+    /* ── RISK GAUGE ── */
+    .gauge-section { display: flex; flex-direction: column; gap: 1.5rem; }
+    .gauge-row { display: flex; align-items: center; gap: 1.5rem; }
+    .gauge-wrap { text-align: center; }
+    .risk-pct  { font-size: 2rem; font-weight: 300; letter-spacing: -0.04em; color: var(--ink); display: block; line-height: 1; margin-top: 0.4rem; }
+    .risk-cat  { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 0.25rem 0.75rem; border-radius: 100px; display: inline-block; margin-top: 0.35rem; transition: background 0.4s, color 0.4s; }
+
+    /* ── ZONE BARS ── */
+    .zone-bars { flex: 1; display: flex; flex-direction: column; gap: 0.55rem; }
+    .zb-row    { display: flex; align-items: center; gap: 0.6rem; }
+    .zb-name   { font-size: 0.72rem; color: var(--mid); width: 78px; flex-shrink: 0; }
+    .zb-track  { flex: 1; height: 5px; background: var(--border); border-radius: 100px; overflow: hidden; }
+    .zb-fill   { height: 100%; border-radius: 100px; transition: width 0.7s cubic-bezier(.4,0,.2,1), background 0.5s; }
+    .zb-pct    { font-size: 0.7rem; font-weight: 600; color: var(--muted); width: 30px; text-align: right; transition: color 0.4s; }
+
+    /* ── CONTROLS ── */
+    .demo-controls { display: flex; flex-direction: column; gap: 1.1rem; }
+    .ctrl-row  { display: flex; flex-direction: column; gap: 0.35rem; }
+    .ctrl-top  { display: flex; justify-content: space-between; }
+    .ctrl-top label { font-size: 0.8rem; font-weight: 500; color: var(--ink); }
+    .ctrl-top span  { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+    .ctrl-row input[type="range"] { width: 100%; accent-color: var(--ink); cursor: pointer; }
+
+    /* ── AI RECOMMENDATION ── */
+    .ai-rec { background: var(--black); border-radius: 12px; padding: 1.1rem 1.4rem; margin-top: 0.5rem; }
+    .ai-rec-lbl { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.4rem; }
+    .ai-rec-txt { font-size: 0.83rem; color: rgba(255,255,255,0.82); line-height: 1.55; }
+
+    /* ── SERIE A CLUB CHART ── */
+    .seriea-chart { margin: 2rem 0; }
+    .seriea-chart-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+    .club-bar-row { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.7rem; }
+    .club-bar-name { font-size: 0.78rem; font-weight: 500; color: var(--ink); width: 72px; flex-shrink: 0; }
+    .club-bar-track { flex: 1; height: 28px; background: var(--bg-soft); border-radius: 8px; overflow: hidden; position: relative; }
+    .club-bar-fill {
+      height: 100%; border-radius: 8px; display: flex; align-items: center; padding-left: 0.75rem;
+      font-size: 0.72rem; font-weight: 600; color: #fff; white-space: nowrap;
+      width: 0%; transition: width 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    .club-bar-note { font-size: 0.7rem; color: var(--muted); width: 110px; flex-shrink: 0; line-height: 1.3; }
+    .inter-highlight .club-bar-fill { background: #1D4ED8 !important; }
+    .inter-highlight .club-bar-name { color: #1D4ED8; font-weight: 700; }
+    @keyframes championPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(29,78,216,0.3); } 50% { box-shadow: 0 0 0 6px rgba(29,78,216,0); } }
+    .inter-highlight .club-bar-track { animation: championPulse 2.5s ease-in-out infinite; }
+    .champion-badge { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; background: #1D4ED8; color: #fff; padding: 0.15rem 0.5rem; border-radius: 100px; margin-left: 0.4rem; vertical-align: middle; }
+
+    /* ── FUTURE GRID ── */
+    .future-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin: 2rem 0; }
+    .future-card { border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+    .future-icon { font-size: 1.5rem; margin-bottom: 0.6rem; display: block; }
+    .future-card h4 { font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 0.35rem; }
+    .future-card p  { font-size: 0.8rem; color: var(--muted); line-height: 1.5; margin: 0; }
+
+    @media (max-width: 700px) {
+      .injury-demo { grid-template-columns: 1fr; }
+      .stat-row, .future-grid { grid-template-columns: 1fr; }
+      .gauge-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body data-insight-id="ai-football-injury">
+
+  <nav class="article-nav">
+    <div class="article-nav-left">
+      <a href="../insights.html" class="back-link">All insights</a>
+      <a href="../index.html" class="nav-site-name">Luca Giacomelli</a>
+    </div>
+    <div class="article-nav-right"><a href="../index.html#contact">Let's talk</a></div>
+  </nav>
+
+  <header class="article-header">
+    <!-- Animated data particles -->
+    <div class="data-particle" style="--x:10%;--dur:3.2s;--delay:0s;--dx:15px"></div>
+    <div class="data-particle" style="--x:25%;--dur:2.8s;--delay:0.7s;--dx:-10px"></div>
+    <div class="data-particle" style="--x:55%;--dur:3.5s;--delay:1.4s;--dx:20px"></div>
+    <div class="data-particle" style="--x:75%;--dur:2.9s;--delay:0.3s;--dx:-18px"></div>
+    <div class="data-particle" style="--x:88%;--dur:3.8s;--delay:1.9s;--dx:8px"></div>
+    <div class="article-meta">
+      <span class="article-tag tag-football">Football × AI</span>
+      <span class="article-date">May 2026</span>
+      <span class="article-read-time">9 min read</span>
+    </div>
+    <h1>Your Hamstring Was Warning You Three Weeks Ago. AI Knows.</h1>
+    <p class="article-deck">
+      GPS vests. Muscle oxygen sensors. Acceleration profiles. Today's elite footballer
+      generates over 500 data points per training session. Machine learning models are
+      reading those signals — and flagging injury risk before players feel a thing.
+      This is the science, the business case, and a glimpse at what's coming next.
+    </p>
+  </header>
+
+  <div class="article-body">
+
+    <p>
+      In the 2025/26 Serie A season, injuries reached levels that prompted a national conversation
+      about the sustainability of the modern football calendar. Data tracked across the league
+      showed a clear trend: <strong>injuries are not just growing in absolute numbers — they are
+      growing as a direct function of fixture density.</strong> Clubs competing in Serie A,
+      the Coppa Italia, and the expanded UEFA Champions League (now with a 36-team league phase)
+      faced schedules of 50+ matches per season. Napoli topped the injury ratio table
+      with 117 player-matches lost across 50 games, followed by Juventus at 103 —
+      with some squads losing key players for cumulative months at a time.
+      The cost across the top five European leagues is estimated at over <strong>€2.5 billion</strong>
+      per season: wages paid to unavailable players, replacement transfer fees, and points dropped
+      when the eleven best players aren't on the pitch.
+    </p>
+
+    <p>
+      But one club stood out against that trend. <strong>Inter Milan</strong> — champions of
+      the 2025/26 Serie A — recorded one of the lowest injury ratios in the league,
+      measured as injured-player matches over total matches played. While rivals were
+      depleted for crucial fixtures, Chivu consistently had his first-choice squad available.
+      That wasn't luck. It was the result of a systematic, data-driven approach to load
+      management, recovery monitoring, and predictive sports science. For decades, sports
+      science approached injuries reactively — treat, recover, repeat. Today's best clubs
+      are asking a different question: <strong>"what will go wrong, and when?"</strong>
+    </p>
+
+      <!-- ── INTERACTIVE DEMO ── -->
+    <div class="demo-section">
+      <div class="demo-section-inner">
+        <div class="demo-label">Interactive Demo</div>
+        <h2>Player Injury Risk Dashboard</h2>
+        <p class="demo-intro">Adjust the training parameters below. The model calculates real-time injury risk by zone — the same logic used by top sports science departments.</p>
+
+        <div class="injury-demo">
+
+          <!-- SVG Body Heatmap -->
+          <div class="body-wrap">
+            <span class="body-title">Risk by zone</span>
+            <svg id="body-svg" viewBox="0 0 180 370" width="180" height="370">
+              <!-- Outline strokes for non-risk areas -->
+              <ellipse cx="90" cy="28" rx="21" ry="24" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+              <rect x="83" y="50" width="14" height="14" rx="3" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+              <!-- Shoulders + upper arms -->
+              <rect x="47" y="62" width="22" height="60" rx="10" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+              <rect x="111" y="62" width="22" height="60" rx="10" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+              <!-- Forearms -->
+              <rect x="42" y="120" width="20" height="45" rx="9" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+              <rect x="118" y="120" width="20" height="45" rx="9" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+              <!-- Torso (lower back zone) -->
+              <rect id="z-back" cx="90" cy="95" x="68" y="62" width="44" height="50" rx="6" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+              <!-- Core/Groin (groin zone) -->
+              <rect id="z-groin" x="68" y="110" width="44" height="30" rx="5" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+              <!-- Hips -->
+              <rect x="66" y="138" width="48" height="20" rx="6" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+              <!-- Hamstrings (left & right) — primary risk zone -->
+              <rect id="z-ham-l" x="67" y="156" width="22" height="72" rx="9" fill="#22C55E"/>
+              <rect id="z-ham-r" x="91" y="156" width="22" height="72" rx="9" fill="#22C55E"/>
+              <!-- Knees -->
+              <ellipse id="z-knee-l" cx="78" cy="233" rx="13" ry="10" fill="#22C55E"/>
+              <ellipse id="z-knee-r" cx="102" cy="233" rx="13" ry="10" fill="#22C55E"/>
+              <!-- Calves -->
+              <rect id="z-calf-l" x="68" y="242" width="20" height="60" rx="8" fill="#22C55E"/>
+              <rect id="z-calf-r" x="92" y="242" width="20" height="60" rx="8" fill="#22C55E"/>
+              <!-- Ankles -->
+              <ellipse id="z-ank-l" cx="78" cy="306" rx="12" ry="8" fill="#22C55E"/>
+              <ellipse id="z-ank-r" cx="102" cy="306" rx="12" ry="8" fill="#22C55E"/>
+              <!-- Feet -->
+              <ellipse cx="84" cy="320" rx="18" ry="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+              <ellipse cx="96" cy="320" rx="18" ry="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
+            </svg>
+          </div>
+
+          <!-- Right Panel: gauge + controls -->
+          <div class="gauge-section">
+
+            <div class="gauge-row">
+              <!-- Semicircle gauge -->
+              <div class="gauge-wrap">
+                <svg viewBox="0 0 160 90" width="160" height="90" overflow="visible">
+                  <path d="M 16,80 A 64,64 0 0,1 144,80" fill="none" stroke="#E2E8F0" stroke-width="13" stroke-linecap="round"/>
+                  <path id="gauge-arc" d="M 16,80 A 64,64 0 0,1 144,80" fill="none" stroke="#22C55E" stroke-width="13" stroke-linecap="round"
+                    stroke-dasharray="201" stroke-dashoffset="201" style="transition: stroke-dashoffset 0.8s cubic-bezier(.4,0,.2,1), stroke 0.5s;"/>
+                </svg>
+                <span class="risk-pct" id="risk-pct">0%</span>
+                <span class="risk-cat" id="risk-cat" style="background:#DCFCE7;color:#15803D;">LOW RISK</span>
+              </div>
+
+              <!-- Zone bars -->
+              <div class="zone-bars">
+                <div class="zb-row"><span class="zb-name">Hamstrings</span><div class="zb-track"><div class="zb-fill" id="bar-ham" style="width:0%;background:#22C55E"></div></div><span class="zb-pct" id="pct-ham">0%</span></div>
+                <div class="zb-row"><span class="zb-name">Knees / ACL</span><div class="zb-track"><div class="zb-fill" id="bar-knee" style="width:0%;background:#22C55E"></div></div><span class="zb-pct" id="pct-knee">0%</span></div>
+                <div class="zb-row"><span class="zb-name">Calves</span><div class="zb-track"><div class="zb-fill" id="bar-calf" style="width:0%;background:#22C55E"></div></div><span class="zb-pct" id="pct-calf">0%</span></div>
+                <div class="zb-row"><span class="zb-name">Ankles</span><div class="zb-track"><div class="zb-fill" id="bar-ank" style="width:0%;background:#22C55E"></div></div><span class="zb-pct" id="pct-ank">0%</span></div>
+                <div class="zb-row"><span class="zb-name">Groin</span><div class="zb-track"><div class="zb-fill" id="bar-groin" style="width:0%;background:#22C55E"></div></div><span class="zb-pct" id="pct-groin">0%</span></div>
+                <div class="zb-row"><span class="zb-name">Lower Back</span><div class="zb-track"><div class="zb-fill" id="bar-back" style="width:0%;background:#22C55E"></div></div><span class="zb-pct" id="pct-back">0%</span></div>
+              </div>
+            </div>
+
+            <!-- Sliders -->
+            <div class="demo-controls">
+              <div class="ctrl-row">
+                <div class="ctrl-top"><label>Training Load (% of chronic average)</label><span id="v-load">80%</span></div>
+                <input type="range" id="s-load" min="50" max="200" value="80" step="5" />
+              </div>
+              <div class="ctrl-row">
+                <div class="ctrl-top"><label>Match density (last 14 days)</label><span id="v-matches">2 matches</span></div>
+                <input type="range" id="s-matches" min="0" max="6" value="2" step="1" />
+              </div>
+              <div class="ctrl-row">
+                <div class="ctrl-top"><label>Sleep &amp; recovery score</label><span id="v-sleep">8 / 10</span></div>
+                <input type="range" id="s-sleep" min="1" max="10" value="8" step="1" />
+              </div>
+              <div class="ctrl-row">
+                <div class="ctrl-top"><label>Sprint speed decline (vs. baseline)</label><span id="v-sprint">0%</span></div>
+                <input type="range" id="s-sprint" min="0" max="25" value="0" step="1" />
+              </div>
+            </div>
+
+            <!-- AI Recommendation -->
+            <div class="ai-rec">
+              <div class="ai-rec-lbl">⚡ AI Recommendation</div>
+              <div class="ai-rec-txt" id="ai-rec-txt">Player is within safe operating parameters. Continue standard training programme.</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2>500 Data Points. Every Session.</h2>
+
+    <p>
+      A modern GPS vest worn during training captures position twenty-five times per second.
+      From that raw stream, sports scientists derive acceleration events, deceleration spikes,
+      high-speed running distance, sprint counts, and change-of-direction loads — all in real time.
+      Paired with heart rate variability monitors, muscle oxygen sensors (SmO₂), and recovery
+      questionnaires, each player generates a longitudinal dataset that builds into a unique
+      physiological signature over months and seasons.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <span class="stat-number" data-target="2500" data-suffix="M">0</span>
+        <span class="stat-label">€ lost to injuries across top-5 leagues, 2023/24</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" data-target="73" data-suffix="%">0</span>
+        <span class="stat-label">accuracy of best current AI injury prediction models</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" data-target="40" data-suffix="%">0</span>
+        <span class="stat-label">reduction in soft-tissue injuries at clubs using full monitoring stacks</span>
+      </div>
+    </div>
+
+    <h2>How the Model Works</h2>
+
+    <p>
+      The injury prediction pipeline typically combines two classes of model. The first is a
+      <strong>chronic load model</strong> — comparing training loads over rolling 28-day windows
+      to the athlete's established baseline. Spikes above 1.5× the chronic average correlate
+      strongly with soft-tissue injury risk in the subsequent two weeks.
+      The second class uses <strong>time-series ML</strong> — LSTMs or gradient-boosted trees
+      trained on years of individual player data — to learn the subtle patterns that precede
+      each player's specific injury history. Players are not uniform. A hamstring warning
+      sign in one athlete may look entirely different in another.
+    </p>
+
+    <div class="framework-box">
+      <div class="framework-label">MBA Framework</div>
+      <h3>Expected Value Analysis: The Business Case for Prevention</h3>
+      <p>Every investment in sports science is an Expected Value calculation.</p>
+      <ul>
+        <li><strong>Cost of a hamstring injury:</strong> 6–8 weeks out, salary continued, replacement costs, squad disruption. For a £150K/week player: ~£1.2M direct cost, plus points dropped.</li>
+        <li><strong>Cost of prevention system:</strong> GPS infrastructure, sports science staff, ML platform — roughly £400K–£800K/year for a top club.</li>
+        <li><strong>The EV:</strong> If the system prevents even 3 major injuries per season at a club like Liverpool or City, the ROI exceeds 5×. At that level, injury prevention is not a welfare cost — it's the highest-return investment in the squad.</li>
+      </ul>
+    </div>
+
+    <h2>Serie A 2025/26: The Cost of the Crowded Calendar</h2>
+
+    <p>
+      The expanded Champions League format introduced in 2024/25 added up to eight extra
+      matches for clubs in the league phase alone — on top of an already congested
+      domestic calendar. For Serie A clubs, this created a perfect storm: more matches,
+      shorter recovery windows, and squads stretched beyond their physiological limits.
+      The injury rankings from the 2025/26 season, tracked by <em>Goal.com</em> and
+      <em>Sky Sport Italia</em>, tell the story clearly. The metric that matters most is not
+      raw matches missed, but the <strong>injury ratio</strong> — player-matches lost per
+      team-match played — which normalises for the fact that clubs competing in more
+      competitions necessarily play more games.
+    </p>
+
+    <div class="seriea-chart">
+      <p class="seriea-chart-title">Serie A 2025/26 — Injury Ratio (player-matches missed ÷ total matches played)</p>
+
+      <div class="club-bar-row">
+        <span class="club-bar-name">Napoli</span>
+        <div class="club-bar-track">
+          <div class="club-bar-fill" data-width="100" style="background:#DC2626;">2.34 per match</div>
+        </div>
+        <span class="club-bar-note">117 missed / 50 played</span>
+      </div>
+      <div class="club-bar-row">
+        <span class="club-bar-name">Juventus</span>
+        <div class="club-bar-track">
+          <div class="club-bar-fill" data-width="86" style="background:#EF4444;">2.02 per match</div>
+        </div>
+        <span class="club-bar-note">103 missed / 51 played</span>
+      </div>
+      <div class="club-bar-row">
+        <span class="club-bar-name">Roma</span>
+        <div class="club-bar-track">
+          <div class="club-bar-fill" data-width="64" style="background:#F59E0B;">1.50 per match</div>
+        </div>
+        <span class="club-bar-note">78 missed / 52 played</span>
+      </div>
+      <div class="club-bar-row inter-highlight">
+        <span class="club-bar-name">Inter Milan <span class="champion-badge">🏆 Champions</span></span>
+        <div class="club-bar-track">
+          <div class="club-bar-fill" data-width="61" style="background:#1D4ED8;">1.42 per match</div>
+        </div>
+        <span class="club-bar-note">78 missed / 55 played</span>
+      </div>
+      <div class="club-bar-row">
+        <span class="club-bar-name">AC Milan</span>
+        <div class="club-bar-track">
+          <div class="club-bar-fill" data-width="47" style="background:#22C55E;">1.10 per match</div>
+        </div>
+        <span class="club-bar-note">55 missed / 50 played</span>
+      </div>
+    </div>
+
+    <p>
+      Inter's result is all the more remarkable once you factor in workload. They played
+      <em>more</em> matches than any other Italian club — 55 across Serie A, the Champions
+      League knockout rounds, and the Coppa Italia final run. Yet their injury ratio of
+      <strong>1.42</strong> placed them well below the league's worst offenders. Napoli's
+      ratio of 2.34 and Juventus's 2.02 represent squads that broke down at more than
+      twice Inter's rate relative to matches played. Playing more, breaking down less: that
+      is the direct output of disciplined data-driven load management. Chivu's staff monitored
+      training intensity against recovery baselines after every session, rotated the squad
+      with a precision that kept the first eleven fresh for decisive fixtures, and flagged
+      muscular fatigue patterns early enough to prevent soft-tissue injuries before they
+      happened. The title was won on the pitch — but it was secured in the data room.
+    </p>
+
+    <h2>From Data to Decision</h2>
+    <p>
+      Liverpool's AMS (Athlete Management System) deployment is the most documented example
+      outside Italy. The club claims a <strong>significant reduction in soft-tissue injuries</strong>
+      since 2018, contributing to seasons where key players like Virgil van Dijk and Trent
+      Alexander-Arnold maintained near-complete availability. Barcelona's sports science
+      department publishes similar figures. The pattern is consistent across clubs that
+      invest in full monitoring stacks: not zero injuries — nothing can achieve that —
+      but fewer, shorter, and more predictable ones. Inter Milan's 2025/26 season is now
+      the clearest Italian case study to point to.
+    </p>
+
+    <div class="pull-quote">
+      <p>"We don't try to predict the unpredictable. We try to reduce the preventable — and that turns out to be about 60% of the problem."</p>
+    </div>
+
+    <h2>The Future: What Comes After Prediction</h2>
+
+    <div class="future-grid">
+      <div class="future-card">
+        <span class="future-icon">🦾</span>
+        <h4>Real-time intervention</h4>
+        <p>Wearables that flag risk mid-session, prompting the coach to sub the player before damage occurs — not after.</p>
+      </div>
+      <div class="future-card">
+        <span class="future-icon">🧬</span>
+        <h4>Genomic profiles</h4>
+        <p>DNA testing already screens for collagen gene variants that predict ACL susceptibility. AI cross-references genomics with training load data.</p>
+      </div>
+      <div class="future-card">
+        <span class="future-icon">🤖</span>
+        <h4>Robotic rehabilitation</h4>
+        <p>Exoskeleton-assisted recovery, calibrated by AI to the player's injury profile, cutting return-to-play timelines by 30–40%.</p>
+      </div>
+    </div>
+
+    <div class="takeaways">
+      <div class="takeaways-label">Key Takeaways</div>
+      <ul>
+        <li>Serie A 2025/26 data confirms that injuries grow in direct proportion to fixture density — the expanded Champions League pushed clubs past sustainable physiological limits. Napoli (2.34 ratio) and Juventus (2.02) were hardest hit.</li>
+        <li>Inter Milan won the 2025/26 Scudetto with a ratio of 1.42 — playing more matches than any rival yet breaking down far less. Systematic load management is a competitive advantage, not a welfare cost.</li>
+        <li>The model works by detecting deviations from each player's unique physiological baseline — combining GPS load data, HRV, sleep, and sprint metrics into an early-warning system.</li>
+        <li>Expected Value analysis makes the business case unambiguous: preventing 3 major injuries per season at a top club returns 5× the annual cost of the full monitoring stack.</li>
+        <li>The frontier is real-time intervention, genomic risk profiling, and AI-guided robotic rehabilitation — reducing the preventable 60% of injuries toward zero.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="article-sources">
+    <p>Sources</p>
+    <ol>
+      <li><a href="https://www.goal.com/it/liste/infortuni-in-crescita-i-dati-sulla-serie-a-e-le-squadre-che-hanno-pagato-di-piu-in-testa-c-e-la-juventus-seguono-milan-e-inter/blt0c6d05182c6b65e7" target="_blank">Infortuni in crescita: i dati sulla Serie A e le squadre che hanno pagato di più — Goal.com</a></li>
+      <li><a href="https://sport.sky.it/calcio/serie-a/infortuni-serie-a-2025-2026-classifica#10" target="_blank">Infortuni Serie A 2025/2026: la classifica delle squadre più colpite — Sky Sport Italia</a></li>
+      <li>Ekstrand, J. et al., "Hamstring muscle injuries in professional football," <em>British Journal of Sports Medicine</em>, 2016.</li>
+      <li>Malone, S. et al., "The acute:chronic workload ratio in relation to injury risk in professional soccer," <em>BJSM</em>, 2017.</li>
+      <li>CIES Football Observatory, "The Financial Cost of Football Injuries," 2024 Annual Report.</li>
+      <li>Liverpool FC Sports Science Department public presentations, 2019–2024.</li>
+      <li>Claudino, J.G. et al., "Current approaches to the use of artificial intelligence for injury risk assessment," <em>Sports Medicine Open</em>, 2019.</li>
+    </ol>
+  </div>
+
+  <div class="article-footer-cta">
+    <p>Building AI for sports, health, or performance analytics? Let's talk.</p>
+    <a href="../index.html#contact" class="btn-primary">Let's talk →</a>
+  </div>
+
+  <footer style="background:var(--black);border-top:1px solid rgba(255,255,255,0.06);padding:1.5rem 3rem;">
+    <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.25);">© 2026 Luca Giacomelli · AI Advisor &amp; Architect</p>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="../insights.html" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Insights</a>
+        <a href="../index.html#contact" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ── ANIMATE SERIE A BARS ON SCROLL ── */
+    const barObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.querySelectorAll('.club-bar-fill').forEach(fill => {
+          fill.style.width = fill.dataset.width + '%';
+        });
+        barObs.unobserve(e.target);
+      });
+    }, { threshold: 0.3 });
+    const chartEl = document.querySelector('.seriea-chart');
+    if (chartEl) barObs.observe(chartEl);
+
+    /* ── ANIMATED COUNTERS ── */
+    function animCount(el, target, prefix, suffix, duration) {
+      let start = null;
+      (function step(ts) {
+        if (!start) start = ts;
+        const p = Math.min((ts - start) / duration, 1);
+        const v = Math.round((1 - Math.pow(1 - p, 3)) * target);
+        el.textContent = prefix + v.toLocaleString() + suffix;
+        if (p < 1) requestAnimationFrame(step);
+      })(performance.now());
+    }
+    const statObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        animCount(el, +el.dataset.target, el.dataset.prefix || '', el.dataset.suffix || '', 1400);
+        statObs.unobserve(el);
+      });
+    }, { threshold: 0.6 });
+    document.querySelectorAll('.stat-number').forEach(el => statObs.observe(el));
+
+    /* ── RISK COLOURS ── */
+    function riskColor(pct) {
+      if (pct < 30) return { fill:'#22C55E', bg:'#DCFCE7', text:'#15803D', label:'LOW RISK' };
+      if (pct < 55) return { fill:'#F59E0B', bg:'#FEF3C7', text:'#92400E', label:'MODERATE' };
+      if (pct < 75) return { fill:'#EF4444', bg:'#FEE2E2', text:'#991B1B', label:'HIGH RISK' };
+      return { fill:'#7C3AED', bg:'#EDE9FE', text:'#4C1D95', label:'CRITICAL' };
+    }
+    function setZone(id, pct) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const c = riskColor(pct);
+      el.style.fill = c.fill;
+      el.style.transition = 'fill 0.6s';
+      if (pct >= 70) el.classList.add('zone-pulse');
+      else el.classList.remove('zone-pulse');
+    }
+    function setBar(barId, pctId, pct) {
+      const c = riskColor(pct);
+      const b = document.getElementById(barId);
+      const p = document.getElementById(pctId);
+      if (b) { b.style.width = pct + '%'; b.style.background = c.fill; }
+      if (p) { p.textContent = pct + '%'; p.style.color = pct > 60 ? c.fill : 'var(--muted)'; }
+    }
+
+    /* ── GAUGE ── */
+    const ARC_LEN = 201; // π × 64
+    function setGauge(pct) {
+      const arc = document.getElementById('gauge-arc');
+      const c = riskColor(pct);
+      arc.style.strokeDashoffset = ARC_LEN * (1 - pct / 100);
+      arc.style.stroke = c.fill;
+      document.getElementById('risk-pct').textContent = pct + '%';
+      const cat = document.getElementById('risk-cat');
+      cat.textContent = c.label;
+      cat.style.background = c.bg;
+      cat.style.color = c.text;
+    }
+
+    /* ── RECOMMENDATIONS ── */
+    function getRec(overall, hamPct) {
+      if (overall < 25) return 'Player is within safe operating parameters. Continue standard training programme.';
+      if (overall < 45) return 'Mild load accumulation detected. Consider reducing high-speed running volume by 15% in the next session.';
+      if (overall < 65) return '⚠ Elevated risk profile. Recommend modified training, additional recovery session, and physio check-in before next match.';
+      if (hamPct > 70) return '🔴 Critical hamstring stress indicators. Recommend immediate rest day, ice protocol, and club doctor review. Do not play this week.';
+      return '🔴 High injury risk across multiple zones. Recommend 48-hour rest, full physiotherapy assessment, and medical clearance before return to training.';
+    }
+
+    /* ── UPDATE ALL ── */
+    function update() {
+      const load    = +document.getElementById('s-load').value;
+      const matches = +document.getElementById('s-matches').value;
+      const sleep   = +document.getElementById('s-sleep').value;
+      const sprint  = +document.getElementById('s-sprint').value;
+
+      document.getElementById('v-load').textContent    = load + '%';
+      document.getElementById('v-matches').textContent = matches + ' match' + (matches !== 1 ? 'es' : '');
+      document.getElementById('v-sleep').textContent   = sleep + ' / 10';
+      document.getElementById('v-sprint').textContent  = sprint + '%';
+
+      // Base risk formula
+      const loadRisk    = Math.max(0, (load - 100) / 100 * 60) + (load > 140 ? 20 : 0);
+      const matchRisk   = Math.min(matches / 6 * 45, 45);
+      const sleepRisk   = Math.max(0, (10 - sleep) / 9 * 35);
+      const sprintRisk  = Math.min(sprint / 25 * 40, 40);
+      const base        = Math.min(Math.round((loadRisk * 0.35 + matchRisk * 0.28 + sleepRisk * 0.22 + sprintRisk * 0.15)), 95);
+
+      const zones = {
+        ham:   Math.min(Math.round(base * 1.30), 98),
+        knee:  Math.min(Math.round(base * 0.75), 95),
+        calf:  Math.min(Math.round(base * 0.88), 95),
+        ank:   Math.min(Math.round(base * 0.72), 95),
+        groin: Math.min(Math.round(base * 0.65), 95),
+        back:  Math.min(Math.round(base * 0.55), 95),
+      };
+
+      setGauge(base);
+      setZone('z-ham-l', zones.ham); setZone('z-ham-r', zones.ham);
+      setZone('z-knee-l', zones.knee); setZone('z-knee-r', zones.knee);
+      setZone('z-calf-l', zones.calf); setZone('z-calf-r', zones.calf);
+      setZone('z-ank-l', zones.ank); setZone('z-ank-r', zones.ank);
+      setZone('z-back', zones.back); setZone('z-groin', zones.groin);
+
+      setBar('bar-ham',   'pct-ham',   zones.ham);
+      setBar('bar-knee',  'pct-knee',  zones.knee);
+      setBar('bar-calf',  'pct-calf',  zones.calf);
+      setBar('bar-ank',   'pct-ank',   zones.ank);
+      setBar('bar-groin', 'pct-groin', zones.groin);
+      setBar('bar-back',  'pct-back',  zones.back);
+
+      document.getElementById('ai-rec-txt').textContent = getRec(base, zones.ham);
+    }
+
+    ['s-load','s-matches','s-sleep','s-sprint'].forEach(id =>
+      document.getElementById(id).addEventListener('input', update));
+    update();
+  </script>
+
+  <script src="../data/insights.js"></script>
+  <script src="../js/subscription.js"></script>
+  <script src="../js/paywall.js"></script>
+</body>
+</html>

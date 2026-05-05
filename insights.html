@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insights — AI × Business | Luca Giacomelli</title>
+  <meta name="description" content="AI and business strategy insights from Luca Giacomelli — AI Advisor & Architect. Connecting AI news to MBA frameworks." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/nav.css" />
+  <link rel="stylesheet" href="css/insights-page.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="main-nav" class="scrolled">
+    <a href="index.html" class="nav-logo">Luca Giacomelli</a>
+    <div class="nav-right" style="opacity:1;">
+      <a href="index.html#about">About</a>
+      <a href="insights.html" style="color:var(--ink);">Insights</a>
+      <a href="index.html#advisory">Advisory</a>
+      <a href="index.html#contact" class="nav-cta">Let's talk</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="insights-page-header">
+    <p class="section-num">AI × Business</p>
+    <h1>Insights</h1>
+    <p>AI news, translated into strategy and engineering reality. Each piece connects a real market event to both a business framework and a technical perspective — because good decisions require both.</p>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="insights-controls">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      <input
+        type="text"
+        class="search-input"
+        id="search-input"
+        placeholder="Search insights…"
+        autocomplete="off"
+      />
+    </div>
+    <div class="filter-pills" id="filter-pills">
+      <button class="filter-pill active" data-tag="all">All</button>
+      <button class="filter-pill" data-tag="strategy">Strategy</button>
+      <button class="filter-pill" data-tag="economics">Economics</button>
+      <button class="filter-pill" data-tag="architecture">Architecture</button>
+      <button class="filter-pill" data-tag="football">Football × AI</button>
+    </div>
+    <span class="results-count" id="results-count">3 insights</span>
+  </div>
+
+  <!-- GRID -->
+  <div class="insights-list">
+    <div class="insights-list-grid" id="insights-grid"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer style="background:var(--black);border-top:1px solid rgba(255,255,255,0.06);padding:1.5rem 3rem;">
+    <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.25);">© 2026 Luca Giacomelli · AI Advisor &amp; Architect</p>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="insights.html" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Insights</a>
+        <a href="index.html#advisory" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Advisory</a>
+        <a href="index.html#contact" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">Contact</a>
+        <a href="https://www.linkedin.com/in/luca-giacomelli-20052a136/" target="_blank" style="font-size:0.75rem;color:rgba(255,255,255,0.25);text-decoration:none;">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/insights.js"></script>
+  <script src="js/subscription.js"></script>
+  <script src="js/render-insights.js"></script>
+  <script>
+    renderInsightsPage('#insights-grid', '#results-count');
+    initMiniDemos();
+
+    /* ── NAV SCROLL ── */
+    const nav = document.getElementById('main-nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
+  </script>
+
+</body>
+</html>

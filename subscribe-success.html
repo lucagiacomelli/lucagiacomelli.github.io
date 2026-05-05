@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome — AI × Business Insights | Luca Giacomelli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/nav.css" />
+  <link rel="stylesheet" href="css/paywall.css" />
+</head>
+<body>
+
+  <nav id="main-nav" class="scrolled">
+    <a href="index.html" class="nav-logo">Luca Giacomelli</a>
+    <div class="nav-right" style="opacity:1;">
+      <a href="insights.html">Insights</a>
+      <a href="index.html#contact" class="nav-cta">Let's talk</a>
+    </div>
+  </nav>
+
+  <div class="subscribe-hero">
+    <div class="subscribe-card" style="text-align:center;">
+
+      <div style="font-size:3rem;margin-bottom:1.5rem;">🎉</div>
+      <p class="section-num">Subscription confirmed</p>
+      <h1>Welcome.</h1>
+      <p class="deck">
+        You now have full access to the entire archive.
+        Every insight, every demo — unlocked.
+        Bookmark this page to restore access on any device.
+      </p>
+
+      <a href="insights.html" class="btn-primary" style="display:block;text-align:center;margin-bottom:1rem;">
+        Read the full archive →
+      </a>
+      <a href="index.html" class="btn-secondary" style="display:inline-block;">
+        Back to home
+      </a>
+
+      <div class="restore-section">
+        <p>
+          To manage your subscription (pause, cancel, update payment),
+          visit your customer portal:
+        </p>
+        <a id="portal-link" href="#" class="btn-secondary" style="display:inline-block;">
+          Manage subscription
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="data/insights.js"></script>
+  <script src="js/subscription.js"></script>
+  <script>
+    // Grant access and store in localStorage
+    setSubscribed();
+
+    // Wire portal link
+    document.getElementById('portal-link').href = getPortalUrl();
+  </script>
+</body>
+</html>

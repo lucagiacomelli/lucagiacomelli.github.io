@@ -1,0 +1,263 @@
+/* ─────────────────────────────────────────
+   PAYWALL — article gating + lock states
+   ───────────────────────────────────────── */
+
+/* ─── ARTICLE GATING ──────────────────── */
+
+/* Blurred content — sits behind the card, peeks out below */
+.gated-content {
+  position: relative;
+  z-index: 1;
+  max-height: 260px;
+  overflow: hidden;
+}
+
+/* Fade the blurred content out at the bottom */
+.gated-content::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 140px;
+  background: linear-gradient(to bottom, transparent, var(--bg) 90%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Blur all gated text */
+.gated-content > * {
+  filter: blur(4px);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ─── PAYWALL OVERLAY ─────────────────── */
+/* Sits as a sibling between free content and gated-content.
+   Negative bottom margin pulls the blurred section up so it
+   peeks out beneath the card — card stays on top via z-index. */
+
+.paywall-overlay {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem 1rem 0;
+  margin-bottom: -3rem;
+}
+
+.paywall-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.07);
+}
+
+.paywall-lock {
+  font-size: 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.paywall-card h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+
+.paywall-card p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 1.75rem;
+}
+
+.paywall-price {
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+}
+
+.paywall-btn-primary {
+  display: block;
+  background: var(--ink);
+  color: #fff;
+  padding: 0.85rem 2rem;
+  border-radius: 100px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-decoration: none;
+  margin-bottom: 0.75rem;
+  transition: opacity 0.2s;
+}
+.paywall-btn-primary:hover { opacity: 0.8; }
+
+.paywall-btn-secondary {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.paywall-btn-secondary:hover { color: var(--ink); }
+
+/* ─── LISTING PAGE LOCK STATE ─────────── */
+
+.locked-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.blurred {
+  filter: blur(3px);
+  user-select: none;
+  pointer-events: none;
+}
+
+.lock-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #F1F5F9;
+  color: #64748B;
+  padding: 0.22rem 0.6rem;
+  border-radius: 100px;
+}
+
+.listing-lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(2px);
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.locked-card:hover .listing-lock-overlay { opacity: 1; }
+
+.listing-lock-inner {
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.listing-lock-inner .lock-icon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.6rem;
+}
+
+.listing-lock-inner p {
+  font-size: 0.85rem;
+  color: var(--mid);
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+/* ─── SUBSCRIBE PAGE ──────────────────── */
+
+.subscribe-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+}
+
+.subscribe-card {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+
+.subscribe-card .section-num { margin-bottom: 1rem; }
+
+.subscribe-card h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--black);
+  margin-bottom: 1rem;
+}
+
+.subscribe-card .deck {
+  font-size: 1rem;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+.subscribe-perks {
+  text-align: left;
+  list-style: none;
+  margin: 0 0 2.5rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.subscribe-perks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  font-size: 0.875rem;
+  color: var(--mid);
+  border-bottom: 1px solid var(--border);
+}
+.subscribe-perks li:last-child { border-bottom: none; }
+
+.subscribe-perks li .perk-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  margin-top: 0.1rem;
+}
+
+.subscribe-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.subscribe-price-row .big-price {
+  font-size: 3rem;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  color: var(--black);
+}
+
+.subscribe-price-row .price-period {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.subscribe-note {
+  font-size: 0.75rem;
+  color: var(--faint);
+  margin-top: 1rem;
+}
+
+.restore-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.restore-section p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
