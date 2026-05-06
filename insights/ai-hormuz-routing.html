@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Strait Shuts. The Algorithms Adapt. | Luca Giacomelli</title>
+  <meta name="description" content="When Hormuz closed in 2026, maritime AI processed 1.2 billion AIS signals daily to reroute global trade. The technical architecture behind the fastest supply chain pivot in history."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/article.css"/>
+  <link rel="stylesheet" href="../css/paywall.css"/>
+  <script src="../js/analytics.js"></script>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link rel="icon" type="image/x-icon" href="../favicon.ico"/>
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png"/>
+  <style>
+    .anim-block{background:#070b14;border:1px solid rgba(255,255,255,0.07);border-radius:12px;margin:2.5rem 0;overflow:hidden;position:relative;}
+    .anim-label{position:absolute;top:14px;left:18px;font-size:.65rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#1D4ED8;z-index:10;}
+    .anim-label-right{position:absolute;top:14px;right:18px;font-size:.65rem;font-weight:400;color:rgba(255,255,255,.3);z-index:10;font-variant-numeric:tabular-nums;}
+    #astar-phase-label{background:rgba(4,8,18,.82);border:1px solid rgba(29,78,216,.3);border-radius:6px;padding:.4rem .9rem;font-size:.9rem!important;font-weight:500!important;color:rgba(255,255,255,.9)!important;max-width:380px;text-align:right;line-height:1.5;}
+    @keyframes dashFlow{to{stroke-dashoffset:-60}}
+    @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
+    @keyframes shipGlow{0%,100%{filter:drop-shadow(0 0 3px rgba(29,78,216,.7))}50%{filter:drop-shadow(0 0 9px rgba(29,78,216,1))}}
+    @keyframes orbitA{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes orbitB{from{transform:rotate(120deg)}to{transform:rotate(480deg)}}
+    @keyframes orbitC{from{transform:rotate(240deg)}to{transform:rotate(600deg)}}
+    @keyframes ringPulse{0%{r:5;opacity:.9}100%{r:22;opacity:0}}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    @keyframes hormuzPulse{0%,100%{box-shadow:0 0 14px rgba(239,68,68,.5),0 0 28px rgba(239,68,68,.2)}50%{box-shadow:0 0 22px rgba(239,68,68,.85),0 0 44px rgba(239,68,68,.35)}}
+    .ship-a{animation:shipGlow 2.2s ease-in-out infinite}
+    .ship-b{animation:shipGlow 2.2s ease-in-out infinite;animation-delay:-.7s}
+    .ship-c{animation:shipGlow 2.2s ease-in-out infinite;animation-delay:-1.4s}
+    .route-cape{stroke-dasharray:10 7;animation:dashFlow 1.8s linear infinite}
+    .route-blocked{stroke-dasharray:8 6;animation:dashFlow 2.5s linear infinite}
+    .sat-a{animation:orbitA 9s linear infinite;transform-origin:450px 200px}
+    .sat-b{animation:orbitB 13s linear infinite;transform-origin:450px 200px}
+    .sat-c{animation:orbitC 17s linear infinite;transform-origin:450px 200px}
+    .status-blink{animation:blink 1.4s ease-in-out infinite}
+    /* Price demo */
+    .pdemo{padding:1.8rem 2.2rem 2.2rem}
+    .pdemo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.4rem;margin-bottom:1.8rem}
+    @media(max-width:680px){.pdemo-grid{grid-template-columns:1fr}}
+    .pdemo label{display:block;font-size:.65rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.5rem}
+    .pdemo select,.pdemo input[type=range]{width:100%;cursor:pointer}
+    .pdemo select{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#fff;padding:.45rem .7rem;font-family:'Inter',sans-serif;font-size:.85rem;appearance:none}
+    .pdemo input[type=range]{accent-color:#1D4ED8;margin-top:.3rem}
+    .range-val{font-size:.78rem;color:#1D4ED8;font-weight:500;margin-top:.25rem}
+    .res-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem}
+    @media(max-width:680px){.res-grid{grid-template-columns:1fr 1fr}}
+    .rc{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.9rem 1.1rem;transition:border-color .3s}
+    .rc.hl{border-color:rgba(29,78,216,.4);background:rgba(29,78,216,.06)}
+    .rc .rl{font-size:.62rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.32);margin-bottom:.35rem}
+    .rc .rv{font-size:1.4rem;font-weight:300;color:#fff;font-variant-numeric:tabular-nums;transition:all .35s}
+    .rc .rs{font-size:.68rem;color:rgba(255,255,255,.28);margin-top:.15rem}
+    .rc.warn .rv{color:#f59e0b}.rc.danger .rv{color:#ef4444}.rc.good .rv{color:#10b981}
+    .bar-section{margin-top:1.4rem;padding-top:1.4rem;border-top:1px solid rgba(255,255,255,.05)}
+    .bar-lbl{font-size:.62rem;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:.9rem}
+    .bar-row{display:flex;align-items:center;gap:.9rem;margin-bottom:.6rem}
+    .bar-name{width:130px;font-size:.73rem;color:rgba(255,255,255,.45);flex-shrink:0}
+    .bar-track{flex:1;height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+    .bar-cost{width:70px;text-align:right;font-size:.73rem;color:rgba(255,255,255,.5);font-variant-numeric:tabular-nums;flex-shrink:0}
+
+    /* Leaflet dark overrides */
+    .leaflet-container{background:#06090f}
+    .leaflet-tile-pane{filter:brightness(.92) saturate(1.05)}
+    .leaflet-tooltip{background:rgba(4,8,18,.9);border:1px solid rgba(29,78,216,.25);color:rgba(255,255,255,.75);font-family:'Inter',sans-serif;font-size:.78rem;padding:.35rem .65rem;border-radius:5px;box-shadow:none}
+    .leaflet-tooltip-top::before{border-top-color:rgba(29,78,216,.25)}
+    .leaflet-tooltip-bottom::before{border-bottom-color:rgba(29,78,216,.25)}
+    .leaflet-tooltip-right::before{border-right-color:rgba(29,78,216,.25)}
+    .city-tooltip{font-weight:500;font-size:.8rem;color:#fff}
+    .leaflet-control-attribution{background:rgba(0,0,0,.55)!important;color:rgba(255,255,255,.25)!important;font-size:.6rem!important}
+    .leaflet-control-attribution a{color:rgba(255,255,255,.3)!important}
+    #route-map{position:relative}
+  </style>
+</head>
+<body data-insight-id="ai-hormuz-routing">
+
+<nav class="article-nav">
+  <div class="article-nav-left">
+    <a href="../insights.html" class="back-link">All insights</a>
+    <a href="../index.html" class="nav-site-name">Luca Giacomelli</a>
+  </div>
+  <div class="article-nav-right"><a href="../index.html#contact">Let's talk</a></div>
+</nav>
+
+<header class="article-header">
+  <div class="article-meta">
+    <span class="article-tag tag-technology">Technology</span>
+    <span class="article-date">May 2026</span>
+    <span class="article-read-time">9 min read</span>
+  </div>
+  <h1>The Strait Shuts. The Algorithms Adapt.</h1>
+  <p class="article-deck">When Hormuz closed in March 2026, maritime AI systems processed 1.2 billion AIS signals a day to reroute global trade in real time. This is the technical architecture — and the business logic — behind the fastest supply chain pivot in history.</p>
+</header>
+
+<!-- ═══ ANIMATION 1+3 MERGED: A* ON LEAFLET MAP ═══ -->
+<div class="anim-block" style="border-radius:0;border-left:none;border-right:none;margin:0;overflow:hidden;position:relative">
+  <div class="anim-label" style="z-index:1001;position:absolute">A* Route Intelligence — Live Pathfinding</div>
+  <div class="anim-label-right" id="astar-phase-label" style="z-index:1001;position:absolute">Initialising graph...</div>
+  <div id="route-map" style="height:500px;width:100%;"></div>
+  <!-- A* canvas overlay — positioned by JS after map init -->
+  <canvas id="astar-canvas" style="position:absolute;top:0;left:0;pointer-events:none;z-index:900;"></canvas>
+  <!-- Legend -->
+  <div style="position:absolute;bottom:52px;right:14px;z-index:1001;background:rgba(4,8,18,.88);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.7rem .9rem;font-family:Inter,sans-serif;pointer-events:none">
+    <div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.45rem">
+      <svg width="22" height="4" style="flex-shrink:0"><line x1="0" y1="2" x2="22" y2="2" stroke="#2563eb" stroke-width="2.5"/></svg>
+      <span style="font-size:.73rem;color:rgba(255,255,255,.45)">Optimal route (A*)</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.45rem">
+      <svg width="22" height="4" style="flex-shrink:0"><line x1="0" y1="2" x2="22" y2="2" stroke="rgba(245,158,11,.8)" stroke-width="2" stroke-dasharray="5 4"/></svg>
+      <span style="font-size:.73rem;color:rgba(255,255,255,.45)">Frontier (exploring)</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.55rem;margin-bottom:.45rem">
+      <svg width="22" height="4" style="flex-shrink:0"><line x1="0" y1="2" x2="22" y2="2" stroke="rgba(239,68,68,.65)" stroke-width="2" stroke-dasharray="5 4"/></svg>
+      <span style="font-size:.73rem;color:rgba(255,255,255,.45)">Blocked (Hormuz)</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.55rem">
+      <svg width="22" height="4" style="flex-shrink:0"><line x1="0" y1="2" x2="22" y2="2" stroke="rgba(100,116,139,.5)" stroke-width="1.5" stroke-dasharray="4 5"/></svg>
+      <span style="font-size:.73rem;color:rgba(255,255,255,.45)">Unvisited edge</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ARTICLE BODY — PART 1 ═══ -->
+<div class="article-body">
+  <h2>Why the Cape Route? Understanding the Normal Path First</h2>
+  <p>To appreciate why Hormuz closing upended global trade, you first need to understand how most of it moves in normal times. A container ship leaving Shanghai or Singapore bound for Rotterdam follows a well-worn corridor: across the Indian Ocean, up into the Gulf of Aden, through the narrow <strong>Bab el-Mandeb strait</strong> at the mouth of the Red Sea, north through the Red Sea itself, and finally through the <strong>Suez Canal</strong> into the Mediterranean. Door to door: roughly 11,000 nautical miles and 25–28 days.</p>
+  <p>That route works because three critical chokepoints — Malacca, Bab el-Mandeb, and Suez — stay open. Remove any one of them and the arithmetic changes completely.</p>
+  <div class="framework-box">
+    <div class="framework-label">The Chokepoint Cascade</div>
+    <h3>Why Hormuz Closing Also Closes the Red Sea</h3>
+    <ul>
+      <li><strong>Hormuz closes.</strong> The Strait of Hormuz is the exit valve for the Persian Gulf — it controls roughly 21% of global oil flow. When it closed in March 2026, Gulf-origin tankers had nowhere to go.</li>
+      <li><strong>Bab el-Mandeb becomes untenable.</strong> The Bab el-Mandeb strait, at the southern tip of the Red Sea between Yemen and Djibouti, is a separate chokepoint — but in a major regional conflict, it doesn't stay neutral for long. Houthi missile activity in 2024–25 had already forced many carriers to avoid it; with full-scale hostilities in 2026, the risk premium on transiting it became uninsurable for most operators.</li>
+      <li><strong>The Red Sea corridor shuts.</strong> Even ships that weren't carrying Gulf cargo — container vessels from Singapore, bulk carriers from India — could no longer safely use the Red Sea passage north to Suez. The entire eastern Mediterranean supply chain had to re-route.</li>
+      <li><strong>The Cape becomes the only viable option.</strong> With both northern exits blocked or too dangerous, the only open path from Asia to Europe ran south: down the east coast of Africa, around the Cape of Good Hope, north through the Atlantic. A detour of roughly 7,700 extra nautical miles.</li>
+    </ul>
+  </div>
+  <p>In the first week of March 2026, <strong>383 vessels transited the Cape of Good Hope</strong>. That number normally hovers around 35. In seventy-two hours after Hormuz closed, the maritime industry executed a rerouting of global trade that would have taken months to model manually. It didn't take months. It happened in hours — because AI systems had already been running the scenarios in the background.</p>
+  <p>This is not a story about AI replacing ship captains. It is a story about the <strong>data infrastructure, routing algorithms, and pricing models</strong> now embedded in every major shipping decision — and which were already stress-tested for exactly this tail-risk event.</p>
+  <div class="pull-quote"><p>"383 Cape transits in a single week. Normal is 35. That delta is what real-time AI rerouting looks like at scale."</p></div>
+
+  <h2>The Data Backbone: 1.2 Billion Signals a Day</h2>
+  <p>Every commercial vessel above 300 gross tonnes broadcasts its position continuously via the <strong>Automatic Identification System (AIS)</strong> — a VHF transponder transmitting GPS coordinates, speed, heading, destination, and cargo type every 2–10 seconds. Near coastlines, terrestrial receivers pick up these signals. In open ocean, <strong>satellite AIS (S-AIS)</strong> takes over.</p>
+  <p>Kpler operates over <strong>13,000 AIS receivers across 190 countries</strong>, tracking more than 350,000 vessels and processing upward of <strong>1.2 billion AIS signals every day</strong>. Coastal data latency is under 5 seconds. Open-ocean latency via satellite drops below 60 seconds. Spire Global runs a constellation of 100+ nanosatellites in low Earth orbit, each passing over any ocean region roughly every 90 minutes. exactEarth hosts 58 AIS payloads aboard the Iridium NEXT constellation — meaning coverage is continuous and global.</p>
+  <p>Raw position data is the input layer. The intelligence is what sits on top of it: weather forecasts, port congestion metrics, fuel price feeds, conflict-zone designations, and historical vessel-performance data, all fused into a continuously updated probabilistic model of every ship's position, next move, and ETA — refreshed every few minutes, for every commercial vessel on earth.</p>
+</div>
+
+<!-- ═══ ANIMATION 2: ML EDGE WEIGHT UPDATE ═══ -->
+<div class="anim-block">
+  <div class="anim-label">Live Edge Weight Revision — ML Model Pipeline</div>
+  <div class="anim-label-right">GBT + LSTM ensemble · updates every 60 sec</div>
+  <canvas id="ml-canvas" style="display:block;margin:0 auto;background:#06090f;border-radius:8px"></canvas>
+  <script>
+  (function(){
+    var C=document.getElementById('ml-canvas');
+    var ctx=C.getContext('2d');
+    // ── layout constants ──
+    var W=900,H=420;
+    var DPR=window.devicePixelRatio||1;
+    C.width=W*DPR; C.height=H*DPR;
+    C.style.width=W+'px'; C.style.height=H+'px';
+    ctx.scale(DPR,DPR);
+    // Route edge: Indian Ocean (node A) → Bab el-Mandeb (node B)
+    var A={x:160,y:300,label:'Indian Ocean'},B={x:540,y:160,label:'Bab el-Mandeb'};
+    // Satellite orbit centre (mid-right area)
+    var SAT_OX=680,SAT_OY=80,SAT_R=55;
+    // ML box
+    var ML={x:720,y:220,w:155,h:130};
+
+    // ── animation state ──
+    var t=0; // ms
+    var CYCLE=7000; // ms per full cycle
+    // Ship position along edge (0→1)
+    var shipT=0;
+    var pingActive=false,pingT=0,pingDur=600;
+    var bubbleActive=false,bubbleT=0,bubbleDur=2400;
+    var mlActive=false,mlT=0,mlDur=2000;
+    var weightOld=1842,weightNew=2190,weightCurrent=1842;
+    var weightFlash=0;
+    var lastPingAt=-9999;
+    var PING_INTERVAL=3200;
+    var satAngle=0;
+
+    // AIS data that cycles
+    var aisData=[
+      {speed:'14.2 kn',heading:'312°',waveH:'2.1 m',wind:'18 kn NE',risk:'LOW',dw:+180},
+      {speed:'11.8 kn',heading:'308°',waveH:'4.3 m',wind:'34 kn SW',risk:'MOD',dw:+348},
+      {speed:'9.1 kn', heading:'315°',waveH:'6.7 m',wind:'52 kn W', risk:'HIGH',dw:+642},
+    ];
+    var aisIdx=0;
+    var currentAis=aisData[0];
+
+    function lerp(a,b,f){return a+(b-a)*f;}
+    function easeOut(f){return 1-(1-f)*(1-f);}
+
+    function shipPos(s){
+      return {x:lerp(A.x,B.x,s),y:lerp(A.y,B.y,s)};
+    }
+
+    var lastTime=null;
+    function frame(ts){
+      if(!lastTime)lastTime=ts;
+      var dt=Math.min(ts-lastTime,50);
+      lastTime=ts;
+      t+=dt;
+
+      // Advance ship
+      shipT=(shipT+dt*0.000055)%1;
+
+      // Satellite angle
+      satAngle+=dt*0.0007;
+
+      // Trigger ping
+      if(t-lastPingAt>PING_INTERVAL){
+        lastPingAt=t;
+        pingActive=true; pingT=0;
+        aisIdx=(aisIdx+1)%aisData.length;
+        currentAis=aisData[aisIdx];
+      }
+      if(pingActive){
+        pingT+=dt;
+        if(pingT>pingDur){pingActive=false;bubbleActive=true;bubbleT=0;}
+      }
+      if(bubbleActive){
+        bubbleT+=dt;
+        if(bubbleT>bubbleDur){bubbleActive=false;mlActive=true;mlT=0;weightOld=weightCurrent;}
+      }
+      if(mlActive){
+        mlT+=dt;
+        var f=Math.min(mlT/mlDur,1);
+        weightCurrent=Math.round(lerp(weightOld,weightOld+currentAis.dw,easeOut(f)));
+        weightFlash=f<0.15?1:0;
+        if(mlT>mlDur){mlActive=false;weightFlash=0;}
+      }
+
+      draw();
+      requestAnimationFrame(frame);
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+
+      // Background
+      ctx.fillStyle='#06090f';
+      ctx.fillRect(0,0,W,H);
+
+      // Stars
+      var stars=[[60,30],[150,65],[830,40],[860,110],[220,18],[460,8],[25,310],[80,380],[400,400],[600,30],[700,365]];
+      stars.forEach(function(s){
+        ctx.beginPath();ctx.arc(s[0],s[1],1,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,255,255,0.3)';ctx.fill();
+      });
+
+      // ── Route edge ──
+      drawEdge();
+
+      // ── Node labels ──
+      drawNode(A,'origin');
+      drawNode(B,'blockable');
+
+      // ── Ship ──
+      var sp=shipPos(shipT);
+      drawShip(sp.x,sp.y);
+
+      // ── Satellite ──
+      var sx=SAT_OX+Math.cos(satAngle)*SAT_R;
+      var sy=SAT_OY+Math.sin(satAngle)*SAT_R*0.45;
+      drawSatellite(sx,sy);
+
+      // ── Ping beam from sat to ship ──
+      if(pingActive){
+        var f=pingT/pingDur;
+        var midX=lerp(sx,sp.x,f);
+        var midY=lerp(sy,sp.y,f);
+        ctx.beginPath();
+        ctx.moveTo(sx,sy);
+        ctx.lineTo(midX,midY);
+        ctx.strokeStyle='rgba(245,158,11,'+Math.max(0,1-f*0.3)+')';
+        ctx.lineWidth=1.5;
+        ctx.setLineDash([4,4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        // Ping dot
+        ctx.beginPath();ctx.arc(midX,midY,3,0,Math.PI*2);
+        ctx.fillStyle='#f59e0b';ctx.fill();
+      }
+
+      // ── Data bubble ──
+      if(bubbleActive){
+        var bf=Math.min(bubbleT/200,1);
+        var bo=bf*(1-Math.max(0,(bubbleT-2000)/400));
+        drawDataBubble(sp.x,sp.y,bo);
+      }
+
+      // ── ML box ──
+      drawMLBox();
+
+      // ── Arrow from bubble to ML box when mlActive ──
+      if(mlActive&&bubbleT===0){/* already done */}
+      if(mlActive){
+        var f2=Math.min(mlT/600,1);
+        var arrX=lerp(sp.x+110,ML.x,easeOut(f2));
+        var arrY=lerp(sp.y-50,ML.y+ML.h/2,easeOut(f2));
+        ctx.beginPath();
+        ctx.moveTo(sp.x+90,sp.y-40);
+        ctx.lineTo(arrX,arrY);
+        ctx.strokeStyle='rgba(245,158,11,0.5)';
+        ctx.lineWidth=1;
+        ctx.setLineDash([3,3]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // ── Stats panel (left) ──
+      drawStatsPanel();
+    }
+
+    function drawEdge(){
+      // Background edge (grey)
+      ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);
+      ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=3;ctx.stroke();
+
+      // Animated edge (blue gradient based on progress)
+      var grad=ctx.createLinearGradient(A.x,A.y,B.x,B.y);
+      grad.addColorStop(0,'rgba(29,78,216,0.8)');
+      grad.addColorStop(1,'rgba(37,99,235,0.4)');
+      ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);
+      ctx.strokeStyle=grad;ctx.lineWidth=2;ctx.stroke();
+
+      // Edge weight label (midpoint)
+      var mx=(A.x+B.x)/2,my=(A.y+B.y)/2-22;
+      var wLabel='w = '+weightCurrent+' nm';
+      if(weightFlash>0){
+        ctx.shadowColor='#f59e0b';ctx.shadowBlur=12;
+      }
+      ctx.fillStyle=weightFlash>0?'#fbbf24':'rgba(255,255,255,0.7)';
+      ctx.font='bold 12px Inter,sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText(wLabel,mx,my);
+      ctx.shadowBlur=0;
+
+      // Small delta indicator when updating
+      if(mlActive&&mlT<1200){
+        var delta=currentAis.dw;
+        ctx.fillStyle=delta>300?'#ef4444':delta>150?'#f59e0b':'#10b981';
+        ctx.font='11px Inter,sans-serif';
+        ctx.fillText((delta>0?'+':'')+delta+' nm',mx,my+16);
+      }
+    }
+
+    function drawNode(n,type){
+      var col=type==='origin'?'#2563eb':type==='blockable'?'#ef4444':'#10b981';
+      ctx.beginPath();ctx.arc(n.x,n.y,9,0,Math.PI*2);
+      ctx.fillStyle=col;ctx.fill();
+      ctx.beginPath();ctx.arc(n.x,n.y,9,0,Math.PI*2);
+      ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1;ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,0.75)';
+      ctx.font='11px Inter,sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText(n.label,n.x,n.y+22);
+    }
+
+    function drawShip(x,y){
+      ctx.save();
+      ctx.translate(x,y);
+      // Compute heading angle
+      var angle=Math.atan2(B.y-A.y,B.x-A.x);
+      ctx.rotate(angle);
+      // Triangle ship
+      ctx.beginPath();
+      ctx.moveTo(12,0);ctx.lineTo(-8,6);ctx.lineTo(-8,-6);ctx.closePath();
+      ctx.fillStyle='#60a5fa';ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1;ctx.stroke();
+      ctx.restore();
+
+      // AIS pulse ring around ship
+      var pulse=((t%1200)/1200);
+      ctx.beginPath();ctx.arc(x,y,8+pulse*14,0,Math.PI*2);
+      ctx.strokeStyle='rgba(96,165,250,'+(0.5*(1-pulse))+')';
+      ctx.lineWidth=1;ctx.stroke();
+    }
+
+    function drawSatellite(x,y){
+      ctx.save();ctx.translate(x,y);
+      // Body
+      ctx.fillStyle='#1D4ED8';
+      ctx.fillRect(-6,-4,12,7);
+      // Solar panels
+      ctx.fillStyle='rgba(147,197,253,0.85)';
+      ctx.fillRect(-15,-3,8,4);
+      ctx.fillRect(7,-3,8,4);
+      ctx.restore();
+
+      // Orbit path (ellipse)
+      ctx.beginPath();
+      ctx.ellipse(SAT_OX,SAT_OY,SAT_R,SAT_R*0.45,0,0,Math.PI*2);
+      ctx.strokeStyle='rgba(29,78,216,0.15)';ctx.lineWidth=1;
+      ctx.setLineDash([3,4]);ctx.stroke();ctx.setLineDash([]);
+
+      // Coverage cone below satellite
+      ctx.beginPath();
+      ctx.moveTo(x,y+4);
+      ctx.lineTo(x-40,y+60);
+      ctx.lineTo(x+40,y+60);
+      ctx.closePath();
+      ctx.fillStyle='rgba(29,78,216,0.06)';ctx.fill();
+      ctx.strokeStyle='rgba(29,78,216,0.15)';ctx.lineWidth=0.5;ctx.stroke();
+
+      // Label
+      ctx.fillStyle='rgba(255,255,255,0.4)';
+      ctx.font='9px Inter,sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText('AIS SAT',x,y-10);
+    }
+
+    function drawDataBubble(sx,sy,opacity){
+      if(opacity<=0)return;
+      var bx=sx+16,by=sy-110,bw=180,bh=90;
+      ctx.save();ctx.globalAlpha=opacity;
+      // Box
+      ctx.fillStyle='rgba(4,8,18,0.92)';
+      ctx.strokeStyle='rgba(245,158,11,0.6)';
+      ctx.lineWidth=1;
+      roundRect(ctx,bx,by,bw,bh,6);
+      ctx.fill();ctx.stroke();
+      // Header
+      ctx.fillStyle='#f59e0b';
+      ctx.font='bold 10px Inter,sans-serif';
+      ctx.textAlign='left';
+      ctx.fillText('AIS SIGNAL RECEIVED',bx+10,by+16);
+      // Data rows
+      ctx.fillStyle='rgba(255,255,255,0.5)';
+      ctx.font='9px Inter,sans-serif';
+      ctx.fillText('Speed',bx+10,by+32);
+      ctx.fillText('Heading',bx+10,by+46);
+      ctx.fillText('Wave height',bx+10,by+60);
+      ctx.fillText('Wind',bx+10,by+74);
+      ctx.fillStyle='rgba(255,255,255,0.9)';
+      ctx.textAlign='right';
+      ctx.fillText(currentAis.speed,bx+bw-10,by+32);
+      ctx.fillText(currentAis.heading,bx+bw-10,by+46);
+      ctx.fillText(currentAis.waveH,bx+bw-10,by+60);
+      ctx.fillText(currentAis.wind,bx+bw-10,by+74);
+      // Risk badge
+      var rCol=currentAis.risk==='LOW'?'#10b981':currentAis.risk==='MOD'?'#f59e0b':'#ef4444';
+      ctx.fillStyle=rCol;ctx.font='bold 9px Inter,sans-serif';ctx.textAlign='left';
+      ctx.fillText('RISK: '+currentAis.risk,bx+10,by+87);
+      ctx.restore();
+    }
+
+    function drawMLBox(){
+      var x=ML.x,y=ML.y,w=ML.w,h=ML.h;
+      // Panel
+      ctx.fillStyle='rgba(4,8,18,0.88)';
+      ctx.strokeStyle='rgba(29,78,216,0.35)';
+      ctx.lineWidth=1;
+      roundRect(ctx,x,y,w,h,8);
+      ctx.fill();ctx.stroke();
+
+      // Title
+      ctx.fillStyle='rgba(29,78,216,0.9)';
+      ctx.font='bold 9px Inter,sans-serif';
+      ctx.textAlign='left';
+      ctx.fillText('ML ROUTING ENGINE',x+10,y+16);
+
+      // Model names
+      ctx.fillStyle='rgba(255,255,255,0.45)';
+      ctx.font='8.5px Inter,sans-serif';
+      ctx.fillText('Gradient-Boosted Trees',x+10,y+32);
+      ctx.fillText('LSTM (time-series)',x+10,y+44);
+
+      // Divider
+      ctx.beginPath();ctx.moveTo(x+10,y+52);ctx.lineTo(x+w-10,y+52);
+      ctx.strokeStyle='rgba(29,78,216,0.2)';ctx.lineWidth=0.5;ctx.stroke();
+
+      // Inputs label
+      ctx.fillStyle='rgba(255,255,255,0.3)';
+      ctx.font='8px Inter,sans-serif';
+      ctx.fillText('INPUTS: AIS · weather · conflict',x+10,y+64);
+
+      // Output weight
+      ctx.fillStyle='rgba(255,255,255,0.35)';
+      ctx.font='8px Inter,sans-serif';
+      ctx.fillText('edge weight →',x+10,y+80);
+      ctx.fillStyle=weightFlash>0?'#fbbf24':'rgba(255,255,255,0.9)';
+      ctx.font='bold 18px Inter,sans-serif';
+      ctx.fillText(weightCurrent+' nm',x+10,y+98);
+
+      // Blinking status
+      var blink=Math.sin(t*0.004)>0;
+      ctx.beginPath();ctx.arc(x+14,y+h-14,4,0,Math.PI*2);
+      ctx.fillStyle=mlActive?(blink?'#f59e0b':'rgba(245,158,11,0.3)'):'rgba(16,185,129,0.8)';
+      ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.3)';
+      ctx.font='8px Inter,sans-serif';
+      ctx.textAlign='left';
+      ctx.fillText(mlActive?'UPDATING…':'NOMINAL',x+22,y+h-11);
+    }
+
+    function drawStatsPanel(){
+      var px=18,py=30,pw=140,ph=360;
+      ctx.fillStyle='rgba(4,8,18,0.82)';
+      ctx.strokeStyle='rgba(29,78,216,0.18)';
+      ctx.lineWidth=1;
+      roundRect(ctx,px,py,pw,ph,8);
+      ctx.fill();ctx.stroke();
+
+      ctx.fillStyle='rgba(29,78,216,0.8)';
+      ctx.font='bold 8px Inter,sans-serif';
+      ctx.textAlign='left';
+      ctx.letterSpacing='0.08em';
+      ctx.fillText('NETWORK STATUS',px+10,py+18);
+
+      var rows=[
+        {label:'Spire satellites',val:'100+'},
+        {label:'Kpler AIS receivers',val:'13,000+'},
+        {label:'Vessels tracked',val:'350,000+'},
+        {label:'Signals / day',val:'1.2 B'},
+        {label:'Coastal latency',val:'< 5 sec',col:'#10b981'},
+        {label:'Ocean latency',val:'< 60 sec',col:'#10b981'},
+        {label:'Model update cycle',val:'60 sec',col:'#f59e0b'},
+      ];
+      var ry=py+34;
+      rows.forEach(function(r){
+        ctx.fillStyle='rgba(255,255,255,0.3)';
+        ctx.font='8px Inter,sans-serif';
+        ctx.fillText(r.label,px+10,ry);
+        ry+=12;
+        ctx.fillStyle=r.col||'rgba(255,255,255,0.9)';
+        ctx.font='bold 14px Inter,sans-serif';
+        ctx.fillText(r.val,px+10,ry);
+        ry+=18;
+      });
+
+      // Live indicator
+      var pulse2=Math.sin(t*0.005)>0;
+      ctx.beginPath();ctx.arc(px+14,py+ph-14,4,0,Math.PI*2);
+      ctx.fillStyle=pulse2?'#10b981':'rgba(16,185,129,0.4)';ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.35)';
+      ctx.font='8px Inter,sans-serif';
+      ctx.fillText('All systems nominal',px+22,py+ph-11);
+    }
+
+    function roundRect(ctx,x,y,w,h,r){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);
+      ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+      ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+      ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+      ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+      ctx.closePath();
+    }
+
+    requestAnimationFrame(frame);
+  })();
+  </script>
+  <!-- hidden SVG shell kept only for the defs gradient id referenced by old code; safe to remove -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs><radialGradient id="eg" cx="50%" cy="50%"><stop offset="0%" stop-color="#0d2540"/><stop offset="100%" stop-color="#060d1a"/></radialGradient></defs>
+  </svg>
+</div>
+
+<!-- ═══ ARTICLE BODY — PART 2: ALGORITHM ═══ -->
+<div class="article-body">
+  <h2>Inside the Routing Algorithm: From Dijkstra to Reinforcement Learning</h2>
+  <p>Maritime route optimisation did not start with AI. For decades, the industry used variants of <strong>Dijkstra's shortest-path algorithm</strong> applied to a waypoint graph — nodes connected by edges weighted by distance, weather risk, and piracy probability. A routing system in 1995 and one in 2015 were not conceptually different. What changed is the real-time input layer and the objective function.</p>
+  <div class="framework-box">
+    <div class="framework-label">Technical Architecture</div>
+    <h3>The Modern Maritime Routing Stack</h3>
+    <ul>
+      <li><strong>Layer 1 — Graph construction.</strong> The ocean is discretised into a weighted directed graph. Nodes represent waypoints (typically every 0.5° lat/lon in open water, denser near chokepoints). Edge weights encode distance, fuel cost at vessel speed, probabilistic weather delay, conflict-zone risk premium, and destination port congestion.</li>
+      <li><strong>Layer 2 — Dynamic weight updates.</strong> An ensemble ML model (gradient-boosted trees + LSTM for time-series) continuously revises edge weights as new AIS, weather, and conflict data arrives. When Hormuz closed, the risk weight on edges passing through the Strait went from ~0.02 to effectively ∞ within minutes of the first closure being confirmed by satellite position data.</li>
+      <li><strong>Layer 3 — Constrained optimisation.</strong> A modified A* search finds the minimum-cost path, subject to vessel-specific constraints: draught limits at certain ports, speed curves by engine type, size restrictions in narrow channels. For a VLCC that can't transit Suez anyway due to dimensions, the Cape route is the only mathematically valid path regardless of the blockade.</li>
+      <li><strong>Layer 4 — Fleet-level RL coordination.</strong> Individual vessel optimisation creates collective inefficiency — every ship routing to the same alternative port simultaneously causes congestion not captured in the model. Reinforcement learning agents learn policies that optimise across the fleet: staggering arrivals, splitting cargo, and dynamically repricing departure windows to avoid self-inflicted bottlenecks.</li>
+    </ul>
+  </div>
+
+  <p>The key insight from the algorithmic layer is <strong>speed of adaptation</strong>. Platforms like Windward had modelled Hormuz-closure scenarios before February 2026. When the signal arrived, it was not a novel computation — it was a pre-built contingency that got activated. The industry had been stress-testing this scenario for years.</p>
+
+  <h2>When Routes Change, Prices Move Instantly — and AI Is Trading Both</h2>
+  <p>The Cape of Good Hope route from the Persian Gulf to Rotterdam covers approximately <strong>14,500 nautical miles</strong>. The Suez route (when open) covers roughly 6,800 nautical miles. That gap — 7,700 extra nautical miles — flows immediately into freight economics.</p>
+  <p>For a VLCC running at 14 knots, the Cape route adds approximately <strong>23 extra days at sea</strong>. At 80 tonnes of bunker fuel per day and $650/tonne, that is <strong>$1.2 million in additional fuel cost per voyage</strong> before a single dollar of charter rate is considered. Charter rates for VLCCs spiked to $80,000–$120,000/day during the crisis — a level not seen since the COVID demand shock. The pricing cascade ran simultaneously across spot freight rates, Forward Freight Agreements (FFAs), tanker futures, and oil options — and algorithmic trading systems executed the arbitrage faster than any human desk could respond.</p>
+</div>
+
+<!-- ═══ ANIMATION 4: INTERACTIVE PRICE MODEL ═══ -->
+<div class="anim-block">
+  <div class="anim-label">Freight Cost Model — Interactive</div>
+  <div class="pdemo">
+    <div class="pdemo-grid">
+      <div>
+        <label>Vessel Type</label>
+        <select id="vtype">
+          <option value="vlcc">VLCC — 2,000,000 barrels</option>
+          <option value="suezmax">Suezmax — 1,000,000 barrels</option>
+          <option value="aframax">Aframax — 700,000 barrels</option>
+        </select>
+      </div>
+      <div>
+        <label>Oil Price ($/barrel)</label>
+        <input type="range" id="oilp" min="55" max="145" value="88" step="1"/>
+        <div class="range-val">$<span id="oilv">88</span> / bbl</div>
+      </div>
+      <div>
+        <label>Crisis Charter Premium</label>
+        <input type="range" id="crisisp" min="1" max="3" value="1.8" step="0.05"/>
+        <div class="range-val"><span id="crisisv">1.8</span>× base rate</div>
+      </div>
+    </div>
+    <div class="res-grid">
+      <div class="rc hl"><div class="rl">Cape Route Cost</div><div class="rv" id="rcape">—</div><div class="rs">per voyage</div></div>
+      <div class="rc warn"><div class="rl">vs Normal Suez</div><div class="rv" id="rprem">—</div><div class="rs">route premium</div></div>
+      <div class="rc"><div class="rl">Transit Time</div><div class="rv" id="rdays">—</div><div class="rs">vs 26 via Suez</div></div>
+      <div class="rc"><div class="rl">Freight Rate</div><div class="rv" id="rrate">—</div><div class="rs">per barrel carried</div></div>
+    </div>
+    <div class="bar-section">
+      <div class="bar-lbl">Route Cost Comparison (per voyage)</div>
+      <div class="bar-row"><div class="bar-name">Cape of Good Hope</div><div class="bar-track"><div class="bar-fill" id="bcape" style="background:linear-gradient(90deg,#1D4ED8,#3b82f6)"></div></div><div class="bar-cost" id="blcape">—</div></div>
+      <div class="bar-row"><div class="bar-name">Normal Suez route</div><div class="bar-track"><div class="bar-fill" id="bsuez" style="background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="bar-cost" id="blsuez">—</div></div>
+      <div class="bar-row"><div class="bar-name">Daily charter rate</div><div class="bar-track"><div class="bar-fill" id="bcharter" style="background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="bar-cost" id="blcharter">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ARTICLE BODY — PART 4: BUSINESS ═══ -->
+<div class="article-body">
+  <h2>What This Means for Any Business That Touches Global Supply Chains</h2>
+  <p>The Hormuz crisis is, in a narrow sense, a shipping story. In a broader sense, it is a demonstration of what happens when <strong>real-time AI is embedded at every layer of a physical supply chain</strong> — and what happens to companies that don't have that capability when the model changes overnight.</p>
+  <div class="framework-box">
+    <div class="framework-label">Business Framework</div>
+    <h3>Three Tiers of Supply Chain AI Readiness</h3>
+    <ul>
+      <li><strong>Tier 1 — Real-time visibility.</strong> You know where your cargo is, updated every few minutes, with probabilistic ETAs. This is now table stakes. Companies still relying on weekly shipping updates from brokers are operating with a 5-day information lag in a market that moves in hours.</li>
+      <li><strong>Tier 2 — Scenario modelling.</strong> Your procurement team can run the Hormuz-closes scenario in your digital twin before it happens, with pre-negotiated contingency contracts and rerouting playbooks ready to activate. Windward and Kpler both offer this layer. Most mid-market companies don't use it.</li>
+      <li><strong>Tier 3 — Algorithmic response.</strong> Your system automatically reroutes, adjusts purchase orders, reprices customer commitments, and triggers hedges — without waiting for a human to open a spreadsheet. This is where the frontier sits. It is achievable. Most companies are not there.</li>
+    </ul>
+  </div>
+  <p>The companies that handled the Hormuz closure best were not the ones with the biggest procurement teams. They were the ones that had invested in live data infrastructure <em>before</em> the crisis — meaning when the signal arrived, the model updated and the decision was half-made before a single email was sent.</p>
+
+  <div class="takeaways">
+    <div class="takeaways-label">Key Takeaways</div>
+    <ul>
+      <li>AIS satellite networks now track 350,000+ vessels with sub-60-second open-ocean latency — the raw data infrastructure for real-time supply chain AI already exists and is commercially accessible via Kpler, Spire, and Windward.</li>
+      <li>Modern maritime routing stacks layer A* graph search with dynamically ML-updated edge weights and fleet-level RL coordination. When Hormuz closed, risk weights updated in minutes, not weeks.</li>
+      <li>The Cape of Good Hope route adds ~23 days and over $1.2M in fuel alone for a VLCC — this is the real-time calculation that algorithmic freight pricing systems now execute continuously across spot rates, FFAs, and options.</li>
+      <li>Supply chain AI readiness has three tiers: visibility, scenario modelling, and algorithmic response. Most companies are at Tier 1. The competitive advantage in the next disruption sits at Tier 3.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="article-sources">
+  <p>Sources</p>
+  <ol>
+    <li><a href="https://windward.ai/blog/one-month-into-the-iran-war/" target="_blank">One Month of War in the Gulf: Mapping the Global Maritime Disruption — Windward AI, 2026</a></li>
+    <li><a href="https://windward.ai/blog/bulk-carriers-find-new-route-out-of-hormuz-strait/" target="_blank">Bulk Carriers Find New Route Out of Hormuz Strait — Windward AI, 2026</a></li>
+    <li><a href="https://spire.com/maritime/" target="_blank">Spire Global Maritime: Satellite AIS and Vessel Tracking</a></li>
+    <li><a href="https://www.kpler.com/product/maritime" target="_blank">Kpler Maritime Intelligence: Real-time AIS and Vessel Analytics</a></li>
+    <li><a href="https://ai-online.com/2026/04/alternative-shipping-routes-avoiding-the-strait-of-hormuz-and-the-implications-for-the-global-automotive-supply-chain-2/" target="_blank">Alternative Shipping Routes Avoiding the Strait of Hormuz — AI Online, April 2026</a></li>
+    <li><a href="https://asiatimes.com/2026/03/long-way-round-cape-route-filling-the-hormuz-gap/" target="_blank">Long Way Round: Cape Route Filling the Hormuz Gap — Asia Times, March 2026</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Automatic_identification_system" target="_blank">Automatic Identification System (AIS) — Wikipedia</a></li>
+  </ol>
+</div>
+
+<div class="article-footer-cta">
+  <p>Is your supply chain visible enough to adapt in hours, not weeks? I help companies build the AI infrastructure that makes that possible.</p>
+  <a href="../index.html#contact" class="btn-primary">Let's talk →</a>
+</div>
+
+<footer style="background:var(--black);border-top:1px solid rgba(255,255,255,0.06);padding:1.5rem 3rem;">
+  <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+    <p style="font-size:.75rem;color:rgba(255,255,255,.25);">© 2026 Luca Giacomelli · AI Advisor &amp; Architect</p>
+    <div style="display:flex;gap:1.5rem;">
+      <a href="../index.html#insights" style="font-size:.75rem;color:rgba(255,255,255,.25);text-decoration:none;">Insights</a>
+      <a href="../index.html#contact" style="font-size:.75rem;color:rgba(255,255,255,.25);text-decoration:none;">Contact</a>
+      <a href="https://www.linkedin.com/in/luca-giacomelli-20052a136/" target="_blank" style="font-size:.75rem;color:rgba(255,255,255,.25);text-decoration:none;">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../data/insights.js"></script>
+<script src="../js/subscription.js"></script>
+<script src="../js/paywall.js"></script>
+
+<script>
+
+/* ── PRICE DEMO ── */
+(function(){
+  var V={vlcc:{b:2000000,c:80,base:55000},suezmax:{b:1000000,c:55,base:38000},aframax:{b:700000,c:40,base:28000}};
+  var FUEL=650,CAPE_NM=14500,SUEZ_NM=6800,KTS=14;
+  function fmt(n){return'$'+(n/1e6).toFixed(1)+'M';}
+  function calc(){
+    var vt=document.getElementById('vtype').value;
+    var op=parseFloat(document.getElementById('oilp').value);
+    var cp=parseFloat(document.getElementById('crisisp').value);
+    var v=V[vt];
+    var cDays=Math.round(CAPE_NM/(KTS*24));
+    var sDays=Math.round(SUEZ_NM/(KTS*24));
+    var charter=Math.round(v.base*cp);
+    var cFuel=v.c*cDays*FUEL;
+    var sFuel=v.c*sDays*FUEL;
+    var cCost=cFuel+charter*cDays;
+    var sCost=sFuel+charter*sDays+320000*(v.b/2000000);
+    var prem=cCost-sCost;
+    var rate=cCost/v.b;
+    var maxC=Math.max(cCost,sCost);
+    document.getElementById('rcape').textContent=fmt(cCost);
+    document.getElementById('rprem').textContent='+'+fmt(prem);
+    document.getElementById('rdays').textContent=cDays+' days';
+    document.getElementById('rrate').textContent='$'+rate.toFixed(2);
+    document.getElementById('bcape').style.width=(cCost/maxC*100)+'%';
+    document.getElementById('bsuez').style.width=(sCost/maxC*100)+'%';
+    document.getElementById('bcharter').style.width=Math.min(100,charter/130000*100)+'%';
+    document.getElementById('blcape').textContent=fmt(cCost);
+    document.getElementById('blsuez').textContent=fmt(sCost);
+    document.getElementById('blcharter').textContent='$'+Math.round(charter/1000)+'k/day';
+    var pc=document.getElementById('rprem').parentElement;
+    pc.className='rc '+(prem>5e6?'danger':prem>2e6?'warn':'good');
+  }
+  ['vtype','oilp','crisisp'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){
+      el.addEventListener('input',function(){
+        if(id==='oilp')document.getElementById('oilv').textContent=this.value;
+        if(id==='crisisp')document.getElementById('crisisv').textContent=parseFloat(this.value).toFixed(2);
+        calc();
+      });
+    }
+  });
+  calc();
+})();
+</script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   A* PATHFINDING ON LEAFLET MAP
+   Merged animation: real geographic map + A* graph overlay
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  var mapEl=document.getElementById('route-map');
+  var canvas=document.getElementById('astar-canvas');
+  var phaseLabel=document.getElementById('astar-phase-label');
+  if(!mapEl||!canvas)return;
+
+  /* ── 1. Leaflet map ── */
+  var map=L.map('route-map',{
+    center:[15,35],zoom:3,
+    zoomControl:false,attributionControl:true,
+    scrollWheelZoom:false,dragging:true
+  });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains:'abcd',maxZoom:19
+  }).addTo(map);
+  // Start zoomed in on the Indian Ocean → Red Sea corridor; fly out to show Cape route
+  var BOUNDS_CLOSE=[[-8,35],[28,82]];   // Indian Ocean to Red Sea
+  var BOUNDS_FULL= [[-42,-22],[56,82]]; // Full route: Cape Town to Rotterdam
+  map.fitBounds(BOUNDS_CLOSE,{padding:[30,30]});
+
+  /* ── Static Hormuz blockade marker ── */
+  var hormuzHtml=
+    '<div style="width:34px;height:34px;border-radius:50%;'+
+    'background:rgba(239,68,68,.12);border:2.5px solid rgba(239,68,68,.85);'+
+    'display:flex;align-items:center;justify-content:center;'+
+    'box-shadow:0 0 14px rgba(239,68,68,.5),0 0 28px rgba(239,68,68,.2);'+
+    'animation:hormuzPulse 1.8s ease-in-out infinite">'+
+    '<svg width="14" height="14" viewBox="0 0 14 14">'+
+    '<line x1="2" y1="2" x2="12" y2="12" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>'+
+    '<line x1="12" y1="2" x2="2" y2="12" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>'+
+    '</svg></div>';
+  L.marker([26.5,56.5],{
+    icon:L.divIcon({className:'',html:hormuzHtml,iconSize:[34,34],iconAnchor:[17,17]}),
+    zIndexOffset:1000
+  }).addTo(map)
+    .bindTooltip(
+      '<strong style="color:#ef4444">Strait of Hormuz</strong><br/>'+
+      '<span style="color:rgba(255,255,255,.6);font-size:.78rem">Blockaded since Mar 2026</span><br/>'+
+      '<span style="color:rgba(255,255,255,.45);font-size:.72rem">Triggers closure of Bab el-Mandeb</span>',
+      {direction:'left',className:'leaflet-tooltip',permanent:false}
+    );
+
+  /* ── 2. Canvas sizing & sync ── */
+  function syncCanvas(){
+    var r=mapEl.getBoundingClientRect();
+    canvas.width=r.width;canvas.height=r.height;
+  }
+  syncCanvas();
+  map.on('resize move zoom moveend zoomend',syncCanvas);
+  window.addEventListener('resize',function(){map.invalidateSize();syncCanvas();});
+
+  /* ── 3. Graph nodes (lat, lng, label, h = heuristic to Rotterdam in nm) ── */
+  // Haversine distance in nautical miles
+  function haversine(la1,lo1,la2,lo2){
+    var R=3440.065,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180;
+    var a=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)*Math.sin(dLo/2);
+    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  }
+  var ROTT_LAT=51.9,ROTT_LNG=4.5;
+
+  // Graph: ships from Asia cross the Indian Ocean toward Europe.
+  // Normal route: Indian Ocean → Bab el-Mandeb → Red Sea → Suez → Rotterdam.
+  // Crisis: Hormuz conflict makes Bab el-Mandeb (Red Sea entrance) untenable.
+  // Blocked Bab el-Mandeb forces the Cape of Good Hope detour.
+  var NODES=[
+    {id:0, lat:5.0, lng:73.0, label:'Indian Ocean',    type:'origin'},
+    {id:1, lat:11.5,lng:43.5, label:'Bab el-Mandeb',  type:'blockable'},
+    {id:2, lat:21.0,lng:38.5, label:'Red Sea',         type:'way'},
+    {id:3, lat:30.0,lng:32.5, label:'Suez Canal',      type:'way'},
+    {id:4, lat:35.9,lng:14.5, label:'Malta',           type:'way'},
+    {id:5, lat:51.9,lng:4.5,  label:'Rotterdam',       type:'dest'},
+    {id:6, lat:-8.0,lng:65.0, label:'S. Indian Ocean', type:'way'},
+    {id:7, lat:-34.4,lng:18.5,label:'Cape Town',       type:'way'},
+    {id:8, lat:28.1,lng:-15.4,label:'Las Palmas',      type:'way'},
+    {id:9, lat:46.0,lng:-5.0, label:'Bay of Biscay',   type:'way'},
+  ];
+
+  // Compute heuristic (straight-line nm to Rotterdam) for each node
+  NODES.forEach(function(n){n.h=Math.round(haversine(n.lat,n.lng,ROTT_LAT,ROTT_LNG));});
+
+  // Edge list: [from, to, cost_nm]
+  // SUEZ branch: Indian Ocean → Bab el-Mandeb → Red Sea → Suez → Rotterdam
+  // CAPE branch: Indian Ocean → S. Indian Ocean → Cape Town → Las Palmas → Rotterdam
+  // Blocking Bab el-Mandeb (node 1) leaves only the Cape branch.
+  var EDGES=[
+    [0,1, 1800],  // Indian Ocean → Bab el-Mandeb (Suez route)
+    [0,6, 1500],  // Indian Ocean → S. Indian Ocean (Cape fork)
+    [1,2,  900],  // Bab el-Mandeb → Red Sea
+    [2,3,  600],  // Red Sea → Suez Canal
+    [3,4, 1050],  // Suez Canal → Malta
+    [4,5, 1720],  // Malta → Rotterdam
+    [6,7, 3500],  // S. Indian Ocean → Cape Town
+    [7,8, 4200],  // Cape Town → Las Palmas
+    [8,9, 1500],  // Las Palmas → Bay of Biscay
+    [9,5,  700],  // Biscay → Rotterdam
+  ];
+
+  // Build adjacency for A*
+  var adj={};
+  NODES.forEach(function(n){adj[n.id]=[];});
+  EDGES.forEach(function(e){
+    adj[e[0]].push({to:e[1],cost:e[2]});
+    adj[e[1]].push({to:e[0],cost:e[2]});
+  });
+
+  /* ── 4. Helper: lat/lng → canvas pixel ── */
+  function lp(lat,lng){
+    var pt=map.latLngToContainerPoint([lat,lng]);
+    return {x:pt.x,y:pt.y};
+  }
+
+  /* ── 5. A* pre-computation to get explore sequence ── */
+  function runAStar(blockedNodes){
+    var open=[],closed=new Set(),cameFrom={},g={},f={};
+    NODES.forEach(function(n){g[n.id]=Infinity;f[n.id]=Infinity;});
+    g[0]=0;f[0]=NODES[0].h;
+    open.push({id:0,f:f[0]});
+    var sequence=[];
+    while(open.length){
+      open.sort(function(a,b){return a.f-b.f;});
+      var cur=open.shift();
+      if(closed.has(cur.id))continue;
+      closed.add(cur.id);
+      sequence.push({node:cur.id,g:g[cur.id],h:NODES[cur.id].h,f:f[cur.id]});
+      if(cur.id===5){break;} // Rotterdam is node 5
+      adj[cur.id].forEach(function(nb){
+        if(closed.has(nb.to))return;
+        if(blockedNodes.indexOf(nb.to)>=0)return;
+        var ng=g[cur.id]+nb.cost;
+        if(ng<g[nb.to]){
+          g[nb.to]=ng;
+          f[nb.to]=ng+NODES[nb.to].h;
+          cameFrom[nb.to]=cur.id;
+          open.push({id:nb.to,f:f[nb.to]});
+        }
+      });
+    }
+    // Reconstruct path
+    var path=[];var c=5; // Rotterdam is node 5
+    while(c!==undefined){path.unshift(c);c=cameFrom[c];}
+    if(path[0]!==0)path=[];
+    return {sequence:sequence,path:path,g:g};
+  }
+
+  var suezRun=runAStar([]);          // Suez found (via Bab el-Mandeb)
+  var capeRun=runAStar([1]);         // Bab el-Mandeb blocked → Cape route
+
+  /* ── 6. Animation state machine ── */
+  /* Phases:
+     0  (80f)  — Build graph: edges appear
+     1  (120f) — A* Phase 1: explore toward Suez, highlight nodes with f/g/h
+     2  (50f)  — "ROUTE FOUND via Suez" — highlight suez path
+     3  (60f)  — BLOCKADE flash: Hormuz turns red, path greys out
+     4  (140f) — A* re-runs: explores Cape route
+     5  (∞)    — Cape optimal path glows, ships sail
+  */
+  var PHASE_DUR=[180,380,150,160,460,500];
+  var PHASE_LABELS=[
+    'Building route graph...',
+    'A* exploring — testing Suez route via Bab el-Mandeb...',
+    'Path found via Suez Canal: 6,070 nm · ~28 days',
+    '⚠ BLOCKADE — Bab el-Mandeb closed (Hormuz conflict) · Invalidating route...',
+    'A* re-routing — exploring Cape of Good Hope alternative...',
+    'Optimal path: Cape of Good Hope route · 11,400 nm · ~55 days'
+  ];
+
+  var phase=0,pTimer=0,afId;
+  // Per-edge draw progress (animated draw-on)
+  var edgeProg={};   // key "a,b" → {prog:0..1, style:'base'|'exploring'|'blocked'|'optimal'|'grey'}
+  // Node states
+  var nodeState={};  // id → 'unvisited'|'frontier'|'visited'|'optimal'|'blocked'
+  var nodeCosts={};  // id → {g,h,f}
+  NODES.forEach(function(n){nodeState[n.id]='unvisited';});
+
+  var suezExploreStep=0; // which step in suezRun.sequence we're on
+  var capeExploreStep=0;
+  var blockadeFlash=0;
+  var shipOffsets=[0.04,0.40,0.73];
+  var lastShipTs=null;
+
+  // Ship animation follows the Cape path: Indian Ocean → S. Indian Ocean → Cape Town → Las Palmas → Rotterdam
+  var capeLL=[
+    [5.0,73.0],   // Indian Ocean (node 0)
+    [-2.0,70.0],
+    [-8.0,65.0],  // S. Indian Ocean (node 6)
+    [-16.0,54.0],[-25.0,38.0],
+    [-34.4,18.5], // Cape Town (node 7)
+    [-30.0,7.0],[-18.0,-2.0],[-5.0,-10.0],
+    [10.0,-18.0],
+    [28.1,-15.4], // Las Palmas (node 8)
+    [38.0,-10.0],
+    [46.0,-5.0],  // Bay of Biscay (node 9)
+    [51.9,4.5]    // Rotterdam (node 5)
+  ];
+  var cumD=[0],capeTotal=0;
+  for(var ci=1;ci<capeLL.length;ci++){
+    var d=haversine(capeLL[ci-1][0],capeLL[ci-1][1],capeLL[ci][0],capeLL[ci][1]);
+    capeTotal+=d;cumD.push(capeTotal);
+  }
+  function capePosAt(frac){
+    var t=((frac%1)+1)%1*capeTotal;
+    for(var j=1;j<cumD.length;j++){
+      if(cumD[j]>=t){
+        var s=(t-cumD[j-1])/(cumD[j]-cumD[j-1]);
+        return [capeLL[j-1][0]+(capeLL[j][0]-capeLL[j-1][0])*s,capeLL[j-1][1]+(capeLL[j][1]-capeLL[j-1][1])*s];
+      }
+    }
+    return capeLL[capeLL.length-1];
+  }
+
+  /* ── 7. Draw helpers ── */
+  var ctx=canvas.getContext('2d');
+
+  function drawEdge(a,b,style,prog){
+    var p1=lp(NODES[a].lat,NODES[a].lng),p2=lp(NODES[b].lat,NODES[b].lng);
+    prog=prog===undefined?1:prog;
+    var ex=p1.x+(p2.x-p1.x)*prog, ey=p1.y+(p2.y-p1.y)*prog;
+    ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(ex,ey);
+    ctx.setLineDash([]);ctx.shadowBlur=0;
+    if(style==='optimal'){
+      ctx.strokeStyle='rgba(37,99,235,.95)';ctx.lineWidth=3;
+      ctx.shadowColor='#1D4ED8';ctx.shadowBlur=10;
+    } else if(style==='exploring'){
+      ctx.strokeStyle='rgba(245,158,11,.75)';ctx.lineWidth=2;ctx.setLineDash([6,5]);
+    } else if(style==='blocked'){
+      ctx.strokeStyle='rgba(239,68,68,.55)';ctx.lineWidth=2;ctx.setLineDash([7,6]);
+    } else if(style==='grey'){
+      ctx.strokeStyle='rgba(100,116,139,.3)';ctx.lineWidth=1.2;ctx.setLineDash([4,6]);
+    } else {
+      ctx.strokeStyle='rgba(255,255,255,.09)';ctx.lineWidth=1;ctx.setLineDash([3,6]);
+    }
+    ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
+  }
+
+  function drawNode(id){
+    var n=NODES[id];var p=lp(n.lat,n.lng);
+    var st=nodeState[id];
+    var r=(n.type==='origin'||n.type==='dest')?11:8;
+    // Glow halo for optimal
+    if(st==='optimal'){
+      ctx.beginPath();ctx.arc(p.x,p.y,r+8,0,Math.PI*2);
+      var g2=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r+8);
+      g2.addColorStop(0,'rgba(37,99,235,.45)');g2.addColorStop(1,'rgba(37,99,235,0)');
+      ctx.fillStyle=g2;ctx.fill();
+    }
+    ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);
+    if(st==='blocked'){ctx.fillStyle='rgba(239,68,68,.18)';}
+    else if(st==='optimal'){ctx.fillStyle='#1D4ED8';}
+    else if(st==='visited'){ctx.fillStyle='rgba(37,99,235,.2)';}
+    else if(st==='frontier'){ctx.fillStyle='rgba(245,158,11,.18)';}
+    else{ctx.fillStyle=n.type==='origin'?'rgba(37,99,235,.25)':'rgba(255,255,255,.06)';}
+    ctx.fill();
+    ctx.strokeStyle=(st==='blocked')?'rgba(239,68,68,.85)':(st==='optimal')?'#93c5fd':(st==='frontier')?'rgba(245,158,11,.85)':(st==='visited')?'rgba(59,130,246,.7)':n.type==='origin'?'#1D4ED8':'rgba(255,255,255,.25)';
+    ctx.lineWidth=st==='optimal'?2.2:1.5;ctx.stroke();
+
+    // X mark for blocked
+    if(st==='blocked'){
+      ctx.strokeStyle='rgba(239,68,68,.9)';ctx.lineWidth=2.2;
+      ctx.beginPath();ctx.moveTo(p.x-6,p.y-6);ctx.lineTo(p.x+6,p.y+6);
+      ctx.moveTo(p.x+6,p.y-6);ctx.lineTo(p.x-6,p.y+6);ctx.stroke();
+    }
+
+    // Label
+    ctx.font='bold 9px Inter,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillStyle=st==='blocked'?'rgba(239,68,68,.85)':st==='optimal'?'#bfdbfe':st==='frontier'?'rgba(245,158,11,.85)':'rgba(255,255,255,.5)';
+    var ly=p.y>canvas.height*0.72?p.y-r-5:p.y+r+12;
+    ctx.fillText(n.label,p.x,ly);
+
+    // f/g/h cost badge
+    if(nodeCosts[id]){
+      var c=nodeCosts[id];
+      var bx=p.x+r+4, by=p.y-2;
+      // avoid going off right edge
+      if(bx+82>canvas.width)bx=p.x-r-86;
+      var fStr='f='+(c.f===Infinity?'∞':c.f);
+      var gStr='g='+c.g;
+      var hStr='h='+c.h;
+      ctx.font='7.5px Inter,sans-serif';
+      // background pill
+      var pw=82,ph=30;
+      ctx.fillStyle='rgba(4,8,18,.82)';
+      ctx.beginPath();
+      if(ctx.roundRect){ctx.roundRect(bx,by-10,pw,ph,4);}
+      else{ctx.rect(bx,by-10,pw,ph);}
+      ctx.fill();
+      ctx.strokeStyle='rgba(29,78,216,.2)';ctx.lineWidth=.8;ctx.stroke();
+      ctx.textAlign='left';
+      ctx.fillStyle=st==='optimal'?'#60a5fa':'rgba(245,158,11,.9)';
+      ctx.fillText(fStr,bx+5,by+3);
+      ctx.fillStyle='rgba(255,255,255,.45)';
+      ctx.fillText(gStr,bx+5,by+13);
+      ctx.fillText(hStr,bx+42,by+13);
+    }
+  }
+
+  function drawShip(lat,lng){
+    var p=lp(lat,lng);
+    ctx.save();
+    ctx.shadowColor='rgba(37,99,235,.9)';ctx.shadowBlur=8;
+    ctx.fillStyle='#2563eb';
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y-7);ctx.lineTo(p.x+4,p.y+5);ctx.lineTo(p.x,p.y+2);ctx.lineTo(p.x-4,p.y+5);
+    ctx.closePath();ctx.fill();
+    ctx.restore();
+  }
+
+  function drawStatsPanel(){
+    var pw=170,ph=108,px2=14,py2=34;
+    ctx.fillStyle='rgba(2,6,14,.88)';
+    ctx.beginPath();
+    if(ctx.roundRect){ctx.roundRect(px2,py2,pw,ph,8);}else{ctx.rect(px2,py2,pw,ph);}
+    ctx.fill();
+    ctx.strokeStyle='rgba(29,78,216,.18)';ctx.lineWidth=1;ctx.stroke();
+    ctx.textAlign='left';
+    ctx.font='7px Inter,sans-serif';
+    ctx.fillStyle='rgba(29,78,216,.8)';ctx.fillText('A* ALGORITHM',px2+10,py2+16);
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillText('Heuristic: straight-line nm to Rotterdam',px2+10,py2+30);
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillText('Nodes visited:',px2+10,py2+46);
+    var visited=0;NODES.forEach(function(n){if(nodeState[n.id]==='visited'||nodeState[n.id]==='optimal')visited++;});
+    ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillText(visited+' / '+NODES.length,px2+90,py2+46);
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillText('Phase:',px2+10,py2+62);
+    ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillText((phase+1)+' / 6',px2+90,py2+62);
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillText('Status:',px2+10,py2+78);
+    var statusColor=phase>=4?'#10b981':phase===3?'#ef4444':'#f59e0b';
+    ctx.fillStyle=statusColor;
+    var statusTxt=phase>=5?'Optimal path found':phase===3?'BLOCKADE':phase>=4?'Re-routing...':'Searching...';
+    ctx.fillText(statusTxt,px2+90,py2+78);
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillText('f(n) = g(n) + h(n)',px2+10,py2+96);
+  }
+
+  /* ── 8. Main animation loop ── */
+  function edgeKey(a,b){return a<b?a+','+b:b+','+a;}
+
+  // Add edge or update style
+  function setEdge(a,b,style,prog){
+    var k=edgeKey(a,b);
+    if(!edgeProg[k])edgeProg[k]={prog:0,style:style};
+    else edgeProg[k].style=style;
+    if(prog!==undefined)edgeProg[k].prog=prog;
+  }
+
+  function animate(ts){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    var W=canvas.width,H=canvas.height;
+
+    /* Phase transitions */
+    pTimer++;
+    if(pTimer>PHASE_DUR[phase]){
+      phase=(phase+1);
+      if(phase>=PHASE_DUR.length)phase=0; // loop
+      pTimer=0;
+      if(phase===0){
+        // Reset — fly back to the close-up start view
+        map.flyToBounds(BOUNDS_CLOSE,{duration:1.8,padding:[30,30]});
+        suezExploreStep=0;capeExploreStep=0;blockadeFlash=0;
+        NODES.forEach(function(n){nodeState[n.id]='unvisited';});
+        nodeCosts={};edgeProg={};shipOffsets=[0.04,0.40,0.73];
+      }
+      if(phase===3){
+        // Fly out to show the full alternative route
+        map.flyToBounds(BOUNDS_FULL,{duration:2.5,padding:[25,25]});
+        // Block Bab el-Mandeb
+        nodeState[1]='blocked';
+        // Grey out suez path edges
+        suezRun.path.forEach(function(id,i){
+          if(i>0){
+            var prev=suezRun.path[i-1];
+            setEdge(prev,id,'grey',1);
+            nodeState[id]='unvisited';
+          }
+        });
+        capeExploreStep=0;
+      }
+    }
+    if(phaseLabel)phaseLabel.textContent=PHASE_LABELS[phase]||'';
+
+    /* Phase 0: draw base graph edges appearing */
+    if(phase===0){
+      nodeState[0]='visited';
+      var edgeCount=EDGES.length;
+      var targetEdges=Math.min(edgeCount,Math.floor(pTimer/5)+1);
+      for(var ei=0;ei<EDGES.length;ei++){
+        var e=EDGES[ei];var k=edgeKey(e[0],e[1]);
+        if(ei<targetEdges){
+          if(!edgeProg[k])edgeProg[k]={prog:0,style:'base'};
+          if(edgeProg[k].prog<1)edgeProg[k].prog=Math.min(1,edgeProg[k].prog+0.06);
+        }
+      }
+    }
+
+    /* Phase 1: A* explores toward Suez */
+    if(phase===1){
+      var stepInterval=Math.floor(PHASE_DUR[1]/suezRun.sequence.length);
+      var targetStep=Math.min(suezRun.sequence.length,Math.floor(pTimer/stepInterval)+1);
+      for(var si=0;si<targetStep&&si<suezRun.sequence.length;si++){
+        var step=suezRun.sequence[si];
+        nodeState[step.node]='visited';
+        nodeCosts[step.node]={g:step.g,h:step.h,f:step.f};
+        // Mark frontier: neighbors
+        adj[step.node].forEach(function(nb){
+          if(nodeState[nb.to]==='unvisited')nodeState[nb.to]='frontier';
+          var k2=edgeKey(step.node,nb.to);
+          if(!edgeProg[k2])edgeProg[k2]={prog:0,style:'exploring'};
+          if(edgeProg[k2].prog<1)edgeProg[k2].prog=Math.min(1,edgeProg[k2].prog+0.04);
+        });
+      }
+    }
+
+    /* Phase 2: highlight Suez optimal path */
+    if(phase===2){
+      suezRun.path.forEach(function(id,i){
+        nodeState[id]='optimal';
+        if(i>0)setEdge(suezRun.path[i-1],id,'optimal',1);
+      });
+    }
+
+    /* Phase 3: blockade flash */
+    if(phase===3){
+      blockadeFlash++;
+      nodeState[1]='blocked';
+      // Pulse effect handled in drawNode
+    }
+
+    /* Phase 4: Cape re-route A* */
+    if(phase===4){
+      // Keep Bab el-Mandeb blocked, grey out Suez edges
+      nodeState[1]='blocked';
+      var stepInterval4=Math.floor(PHASE_DUR[4]/capeRun.sequence.length);
+      var targetStep4=Math.min(capeRun.sequence.length,Math.floor(pTimer/stepInterval4)+1);
+      for(var si4=0;si4<targetStep4&&si4<capeRun.sequence.length;si4++){
+        var step4=capeRun.sequence[si4];
+        if(step4.node===1)continue;
+        nodeState[step4.node]='visited';
+        nodeCosts[step4.node]={g:step4.g,h:step4.h,f:step4.f};
+        adj[step4.node].forEach(function(nb){
+          if(nb.to===1)return;
+          if(nodeState[nb.to]==='unvisited')nodeState[nb.to]='frontier';
+          var k3=edgeKey(step4.node,nb.to);
+          if(!edgeProg[k3])edgeProg[k3]={prog:0,style:'exploring'};
+          if(edgeProg[k3].prog<1)edgeProg[k3].prog=Math.min(1,edgeProg[k3].prog+0.025);
+        });
+      }
+    }
+
+    /* Phases 4+5: keep Suez-corridor edges grey so they never re-glow */
+    if(phase>=4){
+      [[1,2],[2,3],[3,4],[4,5]].forEach(function(e){
+        var k=edgeKey(e[0],e[1]);
+        if(edgeProg[k])edgeProg[k].style='grey';
+      });
+      // Keep Suez-corridor nodes unvisited (not optimal)
+      [1,2,3,4].forEach(function(id){
+        if(nodeState[id]==='optimal')nodeState[id]='visited';
+      });
+    }
+
+    /* Phase 5: optimal Cape path + ships */
+    if(phase>=5){
+      nodeState[1]='blocked';
+      capeRun.path.forEach(function(id,i){
+        nodeState[id]='optimal';
+        if(i>0)setEdge(capeRun.path[i-1],id,'optimal',1);
+      });
+      // Animate ships along cape route
+      if(lastShipTs===null)lastShipTs=ts;
+      var dt=Math.min(ts-lastShipTs,80);lastShipTs=ts;
+      var SPEED=0.000028;
+      shipOffsets=shipOffsets.map(function(o){return(o+SPEED*dt)%1;});
+    } else {lastShipTs=null;}
+
+    /* ── Draw edges ── */
+    EDGES.forEach(function(e){
+      var k=edgeKey(e[0],e[1]);
+      var ep=edgeProg[k];
+      if(ep){drawEdge(e[0],e[1],ep.style,ep.prog);}
+      else{
+        // Draw very faint base if phase>0
+        if(phase>0)drawEdge(e[0],e[1],'base',0.4);
+      }
+    });
+
+    /* ── Draw nodes ── */
+    NODES.forEach(function(n){drawNode(n.id);});
+
+    /* ── Draw ships ── */
+    if(phase>=5){
+      shipOffsets.forEach(function(o){
+        var pos=capePosAt(o);
+        drawShip(pos[0],pos[1]);
+      });
+    }
+
+    /* ── Stats panel ── */
+    drawStatsPanel();
+
+    /* ── Blockade alert overlay ── */
+    if(phase===3){
+      var alpha=0.5+0.5*Math.sin(blockadeFlash*0.18);
+      ctx.fillStyle='rgba(239,68,68,'+alpha*0.13+')';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.font='bold 13px Inter,sans-serif';
+      ctx.textAlign='center';
+      ctx.fillStyle='rgba(239,68,68,'+alpha+')';
+      ctx.shadowColor='rgba(239,68,68,.8)';ctx.shadowBlur=16;
+      ctx.fillText('⚠  BAB EL-MANDEB BLOCKED — RED SEA CORRIDOR CLOSED',canvas.width/2,canvas.height/2);
+      ctx.shadowBlur=0;
+    }
+
+    afId=requestAnimationFrame(animate);
+  }
+  afId=requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>

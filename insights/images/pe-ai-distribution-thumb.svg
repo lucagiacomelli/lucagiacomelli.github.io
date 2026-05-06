@@ -1,0 +1,64 @@
+<svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <!-- Background -->
+  <rect width="800" height="450" fill="#0a0a0a"/>
+
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="150" x2="800" y2="150" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+  <line x1="0" y1="300" x2="800" y2="300" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+  <line x1="200" y1="0" x2="200" y2="450" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+  <line x1="400" y1="0" x2="400" y2="450" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+  <line x1="600" y1="0" x2="600" y2="450" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+  <!-- Central node: PE Fund -->
+  <circle cx="400" cy="200" r="52" fill="none" stroke="#1D4ED8" stroke-width="2"/>
+  <circle cx="400" cy="200" r="42" fill="rgba(29,78,216,0.12)"/>
+  <text x="400" y="196" text-anchor="middle" fill="#1D4ED8" font-size="11" font-weight="600" letter-spacing="0.1em">PE FUND</text>
+  <text x="400" y="213" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="9">$10B vehicle</text>
+
+  <!-- Spoke nodes: portfolio companies -->
+  <!-- Node 1: top-left -->
+  <circle cx="160" cy="100" r="26" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <text x="160" y="105" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="8.5" font-weight="500">HEALTH</text>
+
+  <!-- Node 2: top -->
+  <circle cx="400" cy="68" r="26" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <text x="400" y="73" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="8.5" font-weight="500">FINANCE</text>
+
+  <!-- Node 3: top-right -->
+  <circle cx="640" cy="100" r="26" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <text x="640" y="105" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="8.5" font-weight="500">LOGISTICS</text>
+
+  <!-- Node 4: left -->
+  <circle cx="95" cy="220" r="26" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <text x="95" y="225" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="8.5" font-weight="500">MFG</text>
+
+  <!-- Node 5: right -->
+  <circle cx="705" cy="220" r="26" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <text x="705" y="225" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="8.5" font-weight="500">RETAIL</text>
+
+  <!-- Node 6: bottom-left -->
+  <circle cx="185" cy="332" r="26" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <text x="185" y="337" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="8.5" font-weight="500">ENERGY</text>
+
+  <!-- Node 7: bottom -->
+  <circle cx="400" cy="356" r="26" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <text x="400" y="361" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="8.5" font-weight="500">LEGAL</text>
+
+  <!-- Node 8: bottom-right -->
+  <circle cx="612" cy="332" r="26" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <text x="612" y="337" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="8.5" font-weight="500">MEDIA</text>
+
+  <!-- Connecting lines (spokes) -->
+  <line x1="367" y1="170" x2="181" y2="118" stroke="rgba(29,78,216,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="390" y1="148" x2="400" y2="94" stroke="rgba(29,78,216,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="433" y1="170" x2="618" y2="118" stroke="rgba(29,78,216,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="348" y1="200" x2="121" y2="216" stroke="rgba(29,78,216,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="452" y1="200" x2="679" y2="216" stroke="rgba(29,78,216,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="369" y1="232" x2="207" y2="314" stroke="rgba(29,78,216,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="400" y1="252" x2="400" y2="330" stroke="rgba(29,78,216,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="431" y1="232" x2="591" y2="314" stroke="rgba(29,78,216,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- Title text -->
+  <text x="400" y="415" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="17" font-weight="600" letter-spacing="-0.02em">PE Is AI's New Sales Force</text>
+  <text x="400" y="436" text-anchor="middle" fill="rgba(255,255,255,0.28)" font-size="10.5" letter-spacing="0.04em">lucagiacomelli.github.io</text>
+</svg>

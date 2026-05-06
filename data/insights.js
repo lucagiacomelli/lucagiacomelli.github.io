@@ -19,6 +19,20 @@ const FREE_INSIGHTS_COUNT = 5;
 const INSIGHTS = [
 
   // {
+  //   id:          'pe-ai-distribution',
+  //   title:       'OpenAI Didn\'t Raise $10 Billion. It Bought a Sales Force.',
+  //   tag:         'strategy',
+  //   tagLabel:    'Strategy',
+  //   excerpt:     'The Deployment Company isn\'t a funding round — it\'s a distribution strategy. Why private equity is now AI\'s most efficient go-to-market channel, and what that means for every company in their portfolio.',
+  //   date:        '2026-05-06',
+  //   dateDisplay: 'May 2026',
+  //   readTime:    '8 min read',
+  //   url:         'insights/pe-ai-distribution.html',
+  //   thumb:       'insights/images/pe-ai-distribution-thumb.svg',
+  //   hasDemo:     true,
+  //   miniDemo:    false,
+  // },
+  // {
   //   id:          'llm-unit-economics',
   //   title:       'LLM Prices Crashed 80% in Two Years. Here\'s What That Does to Your Business Model.',
   //   tag:         'economics',
@@ -58,6 +72,20 @@ const INSIGHTS = [
   //   hasDemo:     true,
   //   miniDemo:    false,
   // },
+  {
+    id:          'ai-hormuz-routing',
+    title:       'The Strait Shuts. The Algorithms Adapt.',
+    tag:         'technology',
+    tagLabel:    'Technology',
+    excerpt:     'When Hormuz closed in March 2026, maritime AI processed 1.2 billion AIS signals daily to reroute global trade in real time. The technical architecture — and the business logic — behind the fastest supply chain pivot in history.',
+    date:        '2026-05-07',
+    dateDisplay: 'May 2026',
+    readTime:    '9 min read',
+    url:         'insights/ai-hormuz-routing.html',
+    thumb:       'insights/images/ai-hormuz-routing-thumb.svg',
+    hasDemo:     true,
+    miniDemo:    false,
+  },
   {
     id:          'ai-football-injury',
     title:       'Your Hamstring Was Warning You Three Weeks Ago. AI Knows.',
