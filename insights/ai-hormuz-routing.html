@@ -586,49 +586,7 @@
   <h2>When Routes Change, Prices Move Instantly — and AI Is Trading Both</h2>
   <p>The Cape of Good Hope route from the Persian Gulf to Rotterdam covers approximately <strong>14,500 nautical miles</strong>. The Suez route (when open) covers roughly 6,800 nautical miles. That gap — 7,700 extra nautical miles — flows immediately into freight economics.</p>
   <p>For a VLCC running at 14 knots, the Cape route adds approximately <strong>23 extra days at sea</strong>. At 80 tonnes of bunker fuel per day and $650/tonne, that is <strong>$1.2 million in additional fuel cost per voyage</strong> before a single dollar of charter rate is considered. Charter rates for VLCCs spiked to $80,000–$120,000/day during the crisis — a level not seen since the COVID demand shock. The pricing cascade ran simultaneously across spot freight rates, Forward Freight Agreements (FFAs), tanker futures, and oil options — and algorithmic trading systems executed the arbitrage faster than any human desk could respond.</p>
-</div>
 
-<!-- ═══ ANIMATION 4: INTERACTIVE PRICE MODEL ═══ -->
-<div class="anim-block">
-  <div class="anim-label">Freight Cost Model — Interactive</div>
-  <div class="pdemo">
-    <div class="pdemo-grid">
-      <div>
-        <label>Vessel Type</label>
-        <select id="vtype">
-          <option value="vlcc">VLCC — 2,000,000 barrels</option>
-          <option value="suezmax">Suezmax — 1,000,000 barrels</option>
-          <option value="aframax">Aframax — 700,000 barrels</option>
-        </select>
-      </div>
-      <div>
-        <label>Oil Price ($/barrel)</label>
-        <input type="range" id="oilp" min="55" max="145" value="88" step="1"/>
-        <div class="range-val">$<span id="oilv">88</span> / bbl</div>
-      </div>
-      <div>
-        <label>Crisis Charter Premium</label>
-        <input type="range" id="crisisp" min="1" max="3" value="1.8" step="0.05"/>
-        <div class="range-val"><span id="crisisv">1.8</span>× base rate</div>
-      </div>
-    </div>
-    <div class="res-grid">
-      <div class="rc hl"><div class="rl">Cape Route Cost</div><div class="rv" id="rcape">—</div><div class="rs">per voyage</div></div>
-      <div class="rc warn"><div class="rl">vs Normal Suez</div><div class="rv" id="rprem">—</div><div class="rs">route premium</div></div>
-      <div class="rc"><div class="rl">Transit Time</div><div class="rv" id="rdays">—</div><div class="rs">vs 26 via Suez</div></div>
-      <div class="rc"><div class="rl">Freight Rate</div><div class="rv" id="rrate">—</div><div class="rs">per barrel carried</div></div>
-    </div>
-    <div class="bar-section">
-      <div class="bar-lbl">Route Cost Comparison (per voyage)</div>
-      <div class="bar-row"><div class="bar-name">Cape of Good Hope</div><div class="bar-track"><div class="bar-fill" id="bcape" style="background:linear-gradient(90deg,#1D4ED8,#3b82f6)"></div></div><div class="bar-cost" id="blcape">—</div></div>
-      <div class="bar-row"><div class="bar-name">Normal Suez route</div><div class="bar-track"><div class="bar-fill" id="bsuez" style="background:linear-gradient(90deg,#10b981,#34d399)"></div></div><div class="bar-cost" id="blsuez">—</div></div>
-      <div class="bar-row"><div class="bar-name">Daily charter rate</div><div class="bar-track"><div class="bar-fill" id="bcharter" style="background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div><div class="bar-cost" id="blcharter">—</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ ARTICLE BODY — PART 4: BUSINESS ═══ -->
-<div class="article-body">
   <h2>What This Means for Any Business That Touches Global Supply Chains</h2>
   <p>The Hormuz crisis is, in a narrow sense, a shipping story. In a broader sense, it is a demonstration of what happens when <strong>real-time AI is embedded at every layer of a physical supply chain</strong> — and what happens to companies that don't have that capability when the model changes overnight.</p>
   <div class="framework-box">

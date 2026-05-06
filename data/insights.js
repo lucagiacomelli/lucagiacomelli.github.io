@@ -83,7 +83,7 @@ const INSIGHTS = [
     readTime:    '9 min read',
     url:         'insights/ai-hormuz-routing.html',
     thumb:       'insights/images/ai-hormuz-routing-thumb.svg',
-    hasDemo:     true,
+    hasDemo:     false,
     miniDemo:    false,
   },
   {
