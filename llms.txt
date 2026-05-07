@@ -1,0 +1,53 @@
+# Luca Giacomelli — AI Advisor & Architect
+
+> Independent AI advisor and architect helping startups, scale-ups, enterprises, and investors build AI that scales and delivers real business value. Based in London and San Francisco.
+
+## About
+
+Luca Giacomelli is an AI advisor and architect with a rare combination of deep technical expertise and senior business training. He holds an MSc in Computer Science Engineering, conducted AI research at the University of Oxford (published at ACM CIKM and ISWC), and is completing an MBA at Imperial College London. He has 15+ years of experience in technology, has co-founded and led engineering at AI-native startups in San Francisco, and was previously a professional footballer in Italy's professional leagues.
+
+**Background keywords:** AI architecture, AI strategy, machine learning, LLMs, enterprise AI, technical due diligence, Oxford AI research, Imperial College MBA, San Francisco, London.
+
+## Services
+
+- **AI Architecture Review** — Independent assessment of AI system design: data pipelines, model selection, infrastructure, scalability, and technical debt.
+- **AI Strategy & Roadmap** — Where should AI sit in your product strategy? Which capabilities to build vs. buy? Decisions made with rigour, not hype.
+- **Technical Due Diligence** — For VCs and acquirers: assessment of technical credibility, defensibility of claimed capabilities, and the true cost of scaling.
+- **AI Implementation Advisory** — Embedded advisory alongside your team to avoid classic mistakes, accelerate decisions, and ship AI that works.
+
+Works with startups, scale-ups, enterprises, and investors. From a single architecture review to ongoing monthly advisory.
+
+## Insights (Articles)
+
+Long-form analysis connecting AI developments to business strategy and MBA frameworks.
+
+- [AI Agents Are Everywhere — But 94% of Companies Are Worried. Here's Why Architecture Is the New Moat](https://lucagiacomelli.github.io/insights/ai-agents-moat.html)
+  Gartner predicts 40% of enterprise apps will have AI agents by end of 2026. The cause of sprawl is almost always architectural.
+
+- [OpenAI Didn't Raise $10 Billion. It Bought a Sales Force.](https://lucagiacomelli.github.io/insights/pe-ai-distribution.html)
+  Why private equity is now AI's most efficient go-to-market channel, and what that means for every company in their portfolio.
+
+- [The Strait Shuts. The Algorithms Adapt.](https://lucagiacomelli.github.io/insights/ai-hormuz-routing.html)
+  When Hormuz closed in 2026, maritime AI processed 1.2 billion AIS signals daily to reroute global trade.
+
+- [OpenAI Is Buying What It Can't Build — The Make vs. Buy Framework](https://lucagiacomelli.github.io/insights/build-vs-buy.html)
+  Six acquisitions in four months. What OpenAI's and Anthropic's diverging strategies reveal about the most important AI decision your company faces.
+
+- [LLM Prices Crashed 80%. What It Means for Your AI Business Model](https://lucagiacomelli.github.io/insights/llm-unit-economics.html)
+  LLM API prices fell 80% between 2024 and 2026. The implications for gross margin, pricing power, and competitive strategy are complex.
+
+- [How AI Is Turning Football Supporters Into Revenue](https://lucagiacomelli.github.io/insights/ai-football-revenue.html)
+  Football has 3.5 billion fans. Most clubs monetise 2% of them. AI is changing that through personalised content, dynamic pricing, and churn prediction.
+
+- [How AI Is Rewriting Football's Transfer Market](https://lucagiacomelli.github.io/insights/ai-football-transfers.html)
+  Football transfers are a €6B+ market built on gut instinct. AI scouting, player valuation models, and performance prediction are changing that.
+
+- [How AI Predicts Football Injuries Before They Happen](https://lucagiacomelli.github.io/insights/ai-football-injury.html)
+  GPS vests, muscle sensors, and machine learning are predicting football injuries weeks before players feel a thing.
+
+## Contact
+
+- **Website:** https://lucagiacomelli.github.io/
+- **Email:** lucagiacomelli1604@gmail.com
+- **LinkedIn:** https://www.linkedin.com/in/luca-giacomelli-20052a136/
+- **Enquiry subject:** AI Advisory Enquiry
