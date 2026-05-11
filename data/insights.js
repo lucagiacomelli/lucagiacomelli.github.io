@@ -18,6 +18,21 @@ const FREE_INSIGHTS_COUNT = 5;
 
 const INSIGHTS = [
 
+  {
+    id:          'healthcare-ai-roi',
+    title:       'Tomorrow I\'m Having ACL Surgery. The Clinical Notes Could Write Themselves.',
+    tag:         'strategy',
+    tagLabel:    'Strategy',
+    excerpt:     'Three pre-assessment appointments before my ACL reconstruction left me with five clinical letters — and a question I couldn\'t stop thinking about. What did any of these documents actually require a human to produce? Almost none of them did. Here\'s what the data at Kaiser Permanente confirms.',
+    date:        '2026-05-08',
+    dateDisplay: 'May 2026',
+    readTime:    '8 min read',
+    url:         'insights/healthcare-ai-roi.html',
+    thumb:       'insights/images/healthcare-ai-roi-thumb.svg',
+    hasDemo:     true,
+    miniDemo:    false,
+  },
+
   // {
   //   id:          'pe-ai-distribution',
   //   title:       'OpenAI Didn\'t Raise $10 Billion. It Bought a Sales Force.',
