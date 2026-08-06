@@ -60,6 +60,29 @@
   flex-wrap: wrap;
 }
 
+/* Override Google Calendar scheduling widget button to match btn-white */
+.contact-links button {
+  background: #fff !important;
+  color: #080808 !important;
+  padding: 0.9rem 2rem !important;
+  border-radius: 100px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+  line-height: normal !important;
+  letter-spacing: -0.01em !important;
+  min-height: unset !important;
+  white-space: nowrap !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: opacity 0.2s, transform 0.2s !important;
+  display: inline-block !important;
+}
+.contact-links button:hover {
+  opacity: 0.88 !important;
+  transform: translateY(-1px) !important;
+}
+
 /* ─── FOOTER ──────────────────────────── */
 
 footer {

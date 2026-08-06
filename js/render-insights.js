@@ -20,6 +20,10 @@ function demoPillHTML() {
    ──────────────────────────────────────────────────────────────── */
 
 function homepageCardHTML(insight, delay) {
+  const thumb = insight.thumb
+    ? `<img class="card-thumb" src="${insight.thumb}" alt="" aria-hidden="true">`
+    : '';
+
   const footer = insight.isLocked
     ? `<span class="coming-soon">🔒 Subscribers only</span>`
     : insight.hasDemo
@@ -28,6 +32,7 @@ function homepageCardHTML(insight, delay) {
 
   return `
     <a href="${insight.url}" class="insight-card reveal reveal-delay-${delay}">
+      ${thumb}
       ${tagPillHTML(insight.tag, insight.tagLabel)}
       <h3>${insight.title}</h3>
       <p>${insight.excerpt}</p>
@@ -85,6 +90,10 @@ function miniDemoHTML(insight) {
 function listingCardHTML(insight) {
   const isLocked = insight.isLocked;
 
+  const thumb = insight.thumb
+    ? `<img class="card-thumb" src="${insight.thumb}" alt="" aria-hidden="true">`
+    : '';
+
   const topBar = `
     <div class="card-top-bar">
       ${tagPillHTML(insight.tag, insight.tagLabel)}
@@ -111,6 +120,7 @@ function listingCardHTML(insight) {
            data-tag="${insight.tag}"
            data-title="${insight.title.toLowerCase()} ${insight.excerpt.toLowerCase()}"
            style="cursor:default;">
+        ${thumb}
         ${topBar}
         <a href="${insight.url}" style="text-decoration:none;display:block;">
           ${body}
@@ -124,6 +134,7 @@ function listingCardHTML(insight) {
        class="insight-list-card"
        data-tag="${insight.tag}"
        data-title="${insight.title.toLowerCase()} ${insight.excerpt.toLowerCase()}">
+      ${thumb}
       ${topBar}${body}
     </a>`;
 }

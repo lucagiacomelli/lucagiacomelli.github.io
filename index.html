@@ -40,6 +40,8 @@
   <link rel="stylesheet" href="css/insights.css" />
   <link rel="stylesheet" href="css/advisory.css" />
   <link rel="stylesheet" href="css/contact.css" />
+  <link href="https://calendar.google.com/calendar/scheduling-button-script.css" rel="stylesheet">
+  <script src="https://calendar.google.com/calendar/scheduling-button-script.js" async></script>
   <script src="js/analytics.js"></script>
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -233,8 +235,21 @@
         First conversation is always free.
       </p>
       <div class="contact-links reveal">
+        <script>
+        (function() {
+          var target = document.currentScript;
+          window.addEventListener('load', function() {
+            calendar.schedulingButton.load({
+              url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ0YNSiEhlUzyiGacWSWBpfe8Ve-80oirMF07JTh7c4357asWGfCZsGJIvUtcJgxiU7_2zcKco16?gv=true',
+              color: '#039BE5',
+              label: 'Book time with me',
+              target,
+            });
+          });
+        })();
+        </script>
         <a href="mailto:lucagiacomelli1604@gmail.com?subject=AI%20Advisory%20Enquiry&body=Hi%20Luca%2C%0A%0AI%27d%20like%20to%20explore%20working%20with%20you%20on%20the%20following%3A%0A%0AChallenge%20%2F%20opportunity%3A%0A%0AAbout%20my%20company%3A%0A%0AWhat%20I%27m%20hoping%20to%20achieve%3A%0A%0ABest%20time%20to%20connect%3A%0A%0ALooking%20forward%20to%20hearing%20from%20you." class="btn-white">Email</a>
-        <a href="https://www.linkedin.com/in/luca-giacomelli-20052a136/" target="_blank" class="btn-outline-white">LinkedIn →</a>
+        <a href="https://www.linkedin.com/in/luca-giacomelli-20052a136/" target="_blank" rel="noopener" class="btn-outline-white">LinkedIn →</a>
       </div>
     </div>
   </section>
