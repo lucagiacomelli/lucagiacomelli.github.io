@@ -10,6 +10,17 @@
 
   // Wait for DOM
   document.addEventListener('DOMContentLoaded', function () {
+    // Populate article meta from insights.js data
+    const insight = (typeof INSIGHTS !== 'undefined') && INSIGHTS.find(i => i.id === insightId);
+    if (insight) {
+      const tagEl      = document.querySelector('.article-tag');
+      const dateEl     = document.querySelector('.article-date');
+      const readTimeEl = document.querySelector('.article-read-time');
+      if (tagEl)      { tagEl.className = 'article-tag tag-' + insight.tag; tagEl.textContent = insight.tagLabel; }
+      if (dateEl)     dateEl.textContent = insight.dateDisplay;
+      if (readTimeEl) readTimeEl.textContent = insight.readTime;
+    }
+
     if (!isInsightLocked(insightId)) return; // free or subscribed — do nothing
 
     const body = document.querySelector('.article-body');

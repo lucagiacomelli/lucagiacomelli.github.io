@@ -14,9 +14,38 @@
    All older ones require a subscription. No manual tagging needed.
 ═══════════════════════════════════════════════════════════════ */
 
-const FREE_INSIGHTS_COUNT = 5;
+const FREE_INSIGHTS_COUNT = 50;
 
 const INSIGHTS = [
+  {
+    id:          'openai-mckinsey-moment',
+    title:       'Those McKinsey Job Posts From Business School? I\'d Read Them Differently Now.',
+    tag:         'strategy',
+    tagLabel:    'Strategy',
+    excerpt:     'Every week, Imperial Business School circulates McKinsey consulting roles to MBA candidates. OpenAI just launched a $4B company that threatens to make most of them obsolete. Here\'s what the rise of the Forward Deployed Engineer means for the future of consulting.',
+    date:        '2026-07-18',
+    dateDisplay: 'Jul 2026',
+    readTime:    '8 min read',
+    url:         'insights/openai-mckinsey-moment.html',
+    thumb:       'insights/images/openai-mckinsey-moment-thumb.svg',
+    hasDemo:     true,
+    miniDemo:    false,
+  },
+
+  {
+    id:          'autonomous-enterprise-shift',
+    title:       'The Autonomous Enterprise Is Here. Most Executives Are Misreading It.',
+    tag:         'strategy',
+    tagLabel:    'Strategy',
+    excerpt:     'In one week in May 2026, SAP, ServiceNow, and IBM all unveiled AI systems designed to run entire business processes without human intervention. The shift from AI assistant to AI operator is real — and the strategic implications go far beyond operational efficiency.',
+    date:        '2026-05-14',
+    dateDisplay: 'May 2026',
+    readTime:    '8 min read',
+    url:         'insights/autonomous-enterprise-shift.html',
+    thumb:       'insights/images/autonomous-enterprise-shift-thumb.svg',
+    hasDemo:     true,
+    miniDemo:    false,
+  },
 
   {
     id:          'healthcare-ai-roi',

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Those McKinsey Job Posts From Business School? I'd Read Them Differently Now. | Luca Giacomelli</title>
+  <meta name="description" content="Imperial Business School still posts McKinsey consulting roles every week. OpenAI just launched a $4B company that threatens to make most of them obsolete. Here's why." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/article.css" />
+  <link rel="stylesheet" href="../css/paywall.css" />
+  <script src="../js/analytics.js"></script>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="../favicon.ico" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+</head>
+<body data-insight-id="openai-mckinsey-moment">
+  <nav class="article-nav">
+    <div class="article-nav-left">
+      <a href="../insights.html" class="back-link">All insights</a>
+      <a href="../index.html" class="nav-site-name">Luca Giacomelli</a>
+    </div>
+    <div class="article-nav-right">
+      <a href="../index.html#contact">Let's talk</a>
+    </div>
+  </nav>
+
+  <header class="article-header">
+    <div class="article-meta">
+      <span class="article-tag"></span>
+      <span class="article-date"></span>
+      <span class="article-read-time"></span>
+    </div>
+    <h1>Those McKinsey Job Posts From Business School? I'd Read Them Differently Now.</h1>
+    <p class="article-deck">Every week, Imperial Business School circulates consulting job listings to MBA candidates. I used to see those posts as a benchmark of ambition. Now I look at them and think about shelf life. OpenAI just launched a $4B company that does what McKinsey does — except it actually ships.</p>
+  </header>
+
+  <!-- INTERACTIVE DEMO: AI Implementation Gap Calculator -->
+  <div style="background:#0f172a;border:1px solid #1e3a5f;border-radius:12px;padding:2rem 2.5rem;margin:3rem 0;max-width:760px;margin-left:auto;margin-right:auto;color:#e2e8f0;">
+    <div style="font-size:0.7rem;letter-spacing:0.12em;color:#60a5fa;font-weight:600;text-transform:uppercase;margin-bottom:0.5rem;">Interactive Calculator</div>
+    <h3 style="margin:0 0 0.25rem;font-size:1.15rem;color:#f1f5f9;">AI Implementation Gap Estimator</h3>
+    <p style="margin:0 0 2rem;font-size:0.85rem;color:#94a3b8;">Model the cost of doing it yourself vs. hiring embedded AI engineers. Adjust for your situation.</p>
+
+    <div style="display:grid;gap:1.5rem;">
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+          <label style="font-size:0.85rem;color:#94a3b8;">Internal AI engineers on the project</label>
+          <span id="lbl-eng" style="font-size:0.85rem;font-weight:600;color:#f1f5f9;">3</span>
+        </div>
+        <input id="sl-eng" type="range" min="1" max="20" step="1" value="3"
+          style="width:100%;accent-color:#1d4ed8;cursor:pointer;" oninput="calcImpl()"/>
+        <div style="display:flex;justify-content:space-between;margin-top:0.25rem;">
+          <span style="font-size:0.7rem;color:#475569;">1</span>
+          <span style="font-size:0.7rem;color:#475569;">20</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+          <label style="font-size:0.85rem;color:#94a3b8;">Number of use cases to deploy</label>
+          <span id="lbl-uc" style="font-size:0.85rem;font-weight:600;color:#f1f5f9;">5</span>
+        </div>
+        <input id="sl-uc" type="range" min="1" max="30" step="1" value="5"
+          style="width:100%;accent-color:#1d4ed8;cursor:pointer;" oninput="calcImpl()"/>
+        <div style="display:flex;justify-content:space-between;margin-top:0.25rem;">
+          <span style="font-size:0.7rem;color:#475569;">1</span>
+          <span style="font-size:0.7rem;color:#475569;">30</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+          <label style="font-size:0.85rem;color:#94a3b8;">Process complexity (1 = simple, 5 = complex)</label>
+          <span id="lbl-cx" style="font-size:0.85rem;font-weight:600;color:#f1f5f9;">3</span>
+        </div>
+        <input id="sl-cx" type="range" min="1" max="5" step="1" value="3"
+          style="width:100%;accent-color:#1d4ed8;cursor:pointer;" oninput="calcImpl()"/>
+        <div style="display:flex;justify-content:space-between;margin-top:0.25rem;">
+          <span style="font-size:0.7rem;color:#475569;">Simple</span>
+          <span style="font-size:0.7rem;color:#475569;">Complex</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+          <label style="font-size:0.85rem;color:#94a3b8;">Average engineer fully-loaded cost / year</label>
+          <span id="lbl-sal" style="font-size:0.85rem;font-weight:600;color:#f1f5f9;">$200K</span>
+        </div>
+        <input id="sl-sal" type="range" min="100000" max="400000" step="10000" value="200000"
+          style="width:100%;accent-color:#1d4ed8;cursor:pointer;" oninput="calcImpl()"/>
+        <div style="display:flex;justify-content:space-between;margin-top:0.25rem;">
+          <span style="font-size:0.7rem;color:#475569;">$100K</span>
+          <span style="font-size:0.7rem;color:#475569;">$400K</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2rem;">
+      <!-- DIY column -->
+      <div style="padding:1.25rem;background:rgba(71,85,105,0.15);border-radius:8px;border:1px solid #1e293b;">
+        <div style="font-size:0.7rem;color:#94a3b8;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;">Build In-House</div>
+        <div style="margin-bottom:0.75rem;">
+          <div id="out-diy-time" style="font-size:1.5rem;font-weight:700;color:#f1f5f9;">14 months</div>
+          <div style="font-size:0.72rem;color:#64748b;margin-top:0.15rem;">Time to production</div>
+        </div>
+        <div>
+          <div id="out-diy-cost" style="font-size:1.5rem;font-weight:700;color:#f1f5f9;">$700K</div>
+          <div style="font-size:0.72rem;color:#64748b;margin-top:0.15rem;">Internal team cost</div>
+        </div>
+      </div>
+
+      <!-- FDE column -->
+      <div style="padding:1.25rem;background:rgba(29,78,216,0.08);border-radius:8px;border:1px solid #1e3a5f;">
+        <div style="font-size:0.7rem;color:#60a5fa;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;">Embedded FDE Team</div>
+        <div style="margin-bottom:0.75rem;">
+          <div id="out-fde-time" style="font-size:1.5rem;font-weight:700;color:#60a5fa;">5 months</div>
+          <div style="font-size:0.72rem;color:#64748b;margin-top:0.15rem;">Time to production</div>
+        </div>
+        <div>
+          <div id="out-fde-cost" style="font-size:1.5rem;font-weight:700;color:#60a5fa;">$1.1M</div>
+          <div style="font-size:0.72rem;color:#64748b;margin-top:0.15rem;">Estimated FDE cost</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time-value insight -->
+    <div style="margin-top:1rem;padding:1rem;background:rgba(29,78,216,0.06);border-radius:8px;border-left:3px solid #1D4ED8;">
+      <div id="out-insight" style="font-size:0.85rem;color:#94a3b8;line-height:1.6;">At 5 use cases with a 9-month head start, the faster path saves <span id="out-months" style="color:#60a5fa;font-weight:600;">9 months</span> — worth <span id="out-oppval" style="color:#60a5fa;font-weight:600;">$1.5M+</span> in opportunity cost at typical enterprise AI ROI rates.</div>
+    </div>
+    <p style="font-size:0.72rem;color:#475569;margin-top:0.75rem;margin-bottom:0;">Model assumes: internal team ramps at 2 use cases/quarter at base complexity; FDE teams 3× faster due to specialist knowledge and pattern reuse. Adjust based on your context.</p>
+  </div>
+
+  <script>
+    function fmtDollar(n) {
+      if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+      if (n >= 1e3) return '$' + Math.round(n / 1e3) + 'K';
+      return '$' + Math.round(n).toLocaleString();
+    }
+    function calcImpl() {
+      const eng  = +document.getElementById('sl-eng').value;
+      const uc   = +document.getElementById('sl-uc').value;
+      const cx   = +document.getElementById('sl-cx').value;
+      const sal  = +document.getElementById('sl-sal').value;
+
+      document.getElementById('lbl-eng').textContent = eng;
+      document.getElementById('lbl-uc').textContent  = uc;
+      document.getElementById('lbl-cx').textContent  = cx;
+      document.getElementById('lbl-sal').textContent = fmtDollar(sal);
+
+      // DIY: base months per use case at complexity 3 = 2.5mo; scales with cx and inverse with eng
+      const baseMonthsPerUC = 1.5 * cx;
+      const ucPerQuarter    = Math.max(1, Math.floor(eng * 0.8));
+      const diyMonths       = Math.ceil((uc / ucPerQuarter) * 3);
+      const diyCost         = eng * sal;
+
+      // FDE: 3x faster, but costs ~$350K per FDE per year; team size = roughly uc/3 FDEs needed
+      const fdeTeam         = Math.max(2, Math.ceil(uc / 3));
+      const fdeMonths       = Math.ceil(diyMonths / 3);
+      const fdeCost         = fdeTeam * 350000 * (fdeMonths / 12);
+
+      const timeSaved       = diyMonths - fdeMonths;
+      const oppCostPerMonth = uc * cx * 150000; // rough opportunity cost per month per use case * complexity
+      const oppValue        = timeSaved * oppCostPerMonth;
+
+      document.getElementById('out-diy-time').textContent = diyMonths + ' months';
+      document.getElementById('out-diy-cost').textContent = fmtDollar(diyCost);
+      document.getElementById('out-fde-time').textContent = fdeMonths + ' months';
+      document.getElementById('out-fde-cost').textContent = fmtDollar(fdeCost);
+      document.getElementById('out-months').textContent   = timeSaved + ' months';
+      document.getElementById('out-oppval').textContent   = fmtDollar(oppValue) + '+';
+    }
+    calcImpl();
+  </script>
+
+  <div class="article-body">
+
+    <p>Last week, Imperial Business School circulated another round of consulting job listings to MBA candidates. McKinsey. Strategy&. Oliver Wyman. The usual names, the usual promise: join us, and you will sit across the table from CEOs, diagnose complex problems, and shape strategy at scale. I have a lot of respect for people who do that work well. But every time I see those posts now, I find myself asking the same question: what exactly will those roles look like in five years?</p>
+
+    <p>The same week those emails went out, OpenAI announced a $4 billion company — not to build a better model, but to <em>implement</em> them. The OpenAI Deployment Company, backed by TPG, Advent, Bain Capital, and Brookfield, will embed Forward Deployed Engineers directly inside enterprise clients. Co-funders include McKinsey and Capgemini. OpenAI simultaneously acquired Tomoro, an AI consulting firm, bringing roughly 150 specialist engineers from day one.</p>
+
+    <p>Read that carefully: McKinsey and Capgemini are co-investing in a company that does what McKinsey and Capgemini do. That is not a vote of confidence in the consulting model. That is an exit hedge.</p>
+
+    <h2>What Consulting Actually Sells</h2>
+
+    <p>To understand what is under threat, you have to be honest about what traditional consulting actually provides. The business model rests on three things: access to a network of senior practitioners, a library of frameworks built from prior engagements, and the credibility that comes from brand. A McKinsey partner charging £5,000 a day is not primarily selling their individual intelligence. They are selling pattern recognition accumulated across hundreds of engagements, delivered through a trusted brand that gives a board cover for the decision they were already leaning toward.</p>
+
+    <p>That model worked when information asymmetry was large and implementation was someone else's problem. The consultant diagnosed, recommended, and left. The client's internal team — or a separate systems integrator — dealt with the messy reality of actually building something.</p>
+
+    <p>AI removes the information asymmetry. You can now get a credible strategic framework from a language model in 20 minutes. The frameworks themselves — Porter's Five Forces, BCG matrix, jobs-to-be-done — are not proprietary. What remains valuable is judgment in genuinely ambiguous situations: M&A decisions, regulatory navigation, stakeholder management at board level. That is a real and durable skill. But it is a much narrower surface area than the full consulting engagement model assumed.</p>
+
+    <div class="pull-quote">
+      <p>"The consultant diagnosed, recommended, and left. AI companies are betting that the diagnosis is now the easy part — and the leaving is the problem."</p>
+    </div>
+
+    <h2>Enter the Forward Deployed Engineer</h2>
+
+    <p>The OpenAI Deployment Company is built around a fundamentally different figure: the Forward Deployed Engineer. This is not a new invention — Palantir built its entire enterprise business on the FDE model — but it represents a direct challenge to the consulting engagement structure.</p>
+
+    <p>An FDE does not arrive with a slide deck. They sit with the operations team and learn the actual workflow, not the idealised process map. They connect AI to the real data — messy, incomplete, inconsistently labelled — not a clean sample dataset. They redesign the process around what the model can actually do, rather than recommending what the model <em>should</em> be able to do. Then they leave a working system, with an engineering team that understands it, and governance documentation that satisfies compliance.</p>
+
+    <p>The results are different in kind, not just degree. Bank of America reported in early 2026 that its AI system now handles 62% of card disputes from initiation to resolution without human intervention. That number does not come from a better model or a sharper strategy memo. It comes from 18 months of embedded engineering work on dispute-handling workflows, legacy system integrations, and a labelled dataset built from real outcomes — not from a recommended approach delivered and left on the table.</p>
+
+    <p>Traditional consulting firms are not structured to do this. Their entire staffing model — junior analysts doing data work, managers synthesising, partners presenting — is optimised for producing high-quality documents on a fixed engagement timeline. Building and owning a production AI system in a client's environment for 12 months is a different business. It requires different people, different incentives, and a willingness to be accountable for outcomes rather than recommendations.</p>
+
+    <h2>Why McKinsey Co-Funded Its Own Replacement</h2>
+
+    <p>The co-investment structure deserves more attention than it has received. McKinsey and Capgemini are not passive LPs in a VC fund. They are named co-funders of a company that is explicitly going to compete for the same enterprise relationships they have cultivated for decades.</p>
+
+    <p>The logic is defensive. Enterprise clients are increasingly arriving at strategy conversations with a specific question: "Can you help us implement this AI system?" Consulting firms have been saying yes, but the gap between a consultant who understands AI conceptually and an engineer who has deployed it in production 40 times is vast and increasingly visible. Clients are starting to notice. By co-investing in the OpenAI Deployment Company, McKinsey and Capgemini buy access to the specialist talent pool and the credibility of being adjacent to the model provider. In exchange, OpenAI gets warm introductions to the world's largest enterprise client lists.</p>
+
+    <p>It is a rational hedge for both sides. But it is also an admission. When you co-fund the company that is cannibalising your core product, you are signalling that you do not believe you can build that capability yourself fast enough to matter.</p>
+
+    <div class="framework-box">
+      <div class="framework-label">Strategy Framework</div>
+      <h3>The Consulting Value Stack: What Survives, What Doesn't</h3>
+      <ul>
+        <li><strong>Framework delivery (being replaced now).</strong> Generic strategy frameworks — market sizing, competitive analysis, operating model design — are increasingly replicable by AI tools at a fraction of the cost. Junior analyst work is already under severe pressure.</li>
+        <li><strong>Implementation (migrating to AI-native firms).</strong> The actual work of embedding AI in enterprise systems is moving to FDE-model companies: OpenAI Deployment Company, Palantir, and a growing tier of boutique applied AI firms. This is not advisory — it is engineering with accountability for outcomes.</li>
+        <li><strong>Genuine judgment (durable, but narrower).</strong> Board-level decisions with irreversible consequences — M&A, regulatory strategy, major restructuring — still benefit from senior human judgment and the political cover that a trusted brand provides. This survives, but it is a smaller fraction of current consulting revenue than the firms want to admit.</li>
+        <li><strong>Governance and compliance (emerging opportunity).</strong> AI audit trails, model risk management, regulatory compliance frameworks — this is genuinely new work that neither traditional consultants nor FDE teams own clearly. The firm that builds this capability credibly will capture significant value.</li>
+      </ul>
+    </div>
+
+    <h2>What This Means If You Are Hiring — or Being Hired</h2>
+
+    <p>If you are a business school student looking at those McKinsey posts: the roles exist, the pay is real, and the network you build is genuinely valuable. But go in with clear eyes about which skills you are developing. Slide production, hypothesis structuring, and client management are useful. Direct exposure to AI implementation — even on the side — is now a prerequisite for being relevant in five years, not a bonus.</p>
+
+    <p>If you are an executive trying to get AI from pilot into production, the OpenAI Deployment Company announcement clarifies a choice you may have been avoiding. Paying a generalist firm's day rate to get a strategy recommendation and a roadmap is not an AI deployment. It is a deferred decision. The work that moves the needle is the messy, unglamorous engineering work that most consulting firms are not structured to do. Find people who are accountable for the system working in production — not for the quality of the recommendation.</p>
+
+    <p>Dell's AI server revenue tripled in 18 months, from $10 billion to $25 billion, with $50 billion projected for 2026. That infrastructure is being deployed inside real organisations. The companies on the right side of that deployment curve are not waiting for a strategy presentation to tell them what to do. They have engineers sitting inside the problem.</p>
+
+    <div class="takeaways">
+      <div class="takeaways-label">Key Takeaways</div>
+      <ul>
+        <li><strong>The consulting model is not dying — it is splitting.</strong> Judgment-heavy, high-stakes advisory has a durable future. Framework delivery and implementation advisory are being replaced by AI tools and FDE-model engineering firms respectively. Know which business you are actually in.</li>
+        <li><strong>McKinsey and Capgemini co-funding OpenAI's deployment company is a tell.</strong> When incumbents co-fund their own disruption, they are signalling they cannot win the capability race alone. Watch how aggressively they try to reframe FDE work as "consulting" over the next 18 months.</li>
+        <li><strong>The FDE model is the new implementation standard.</strong> Embedded engineers who sit inside your organisation, own the integration work, and are accountable for production outcomes are now a viable procurement option — not just a Palantir-specific approach. Evaluate them against your internal team honestly.</li>
+        <li><strong>If you are building an AI career, implementation beats advice.</strong> The market is saturated with people who can talk about AI strategy. It is acutely short of people who have shipped AI systems into production in regulated, legacy-infrastructure environments. That is where the durable premium lives.</li>
+      </ul>
+    </div>
+
+    <p>Imperial Business School will keep posting those McKinsey jobs. Some of them will be genuinely excellent roles. But the most interesting question for anyone reading those listings is not "how do I get this job?" It is "what does this job look like in 2030 — and am I building toward that, or toward what it looked like in 2020?"</p>
+
+    <p>OpenAI just spent $4 billion answering that question for the implementation half of the consulting industry. The strategy half has a little more time. Not as much as it thinks.</p>
+
+  </div>
+
+  <div class="article-sources">
+    <p>Sources</p>
+    <ol>
+      <li>OpenAI, <em>OpenAI launches the OpenAI Deployment Company to help businesses build around intelligence</em>, May 2026. <a href="https://openai.com/index/openai-launches-the-deployment-company/" target="_blank" rel="noopener">openai.com</a></li>
+      <li>PYMNTS, <em>OpenAI Launches $4 Billion Company to Accelerate Enterprise AI Adoption</em>, May 2026. <a href="https://www.pymnts.com/news/artificial-intelligence/2026/openai-launches-4-billion-dollar-company-accelerate-enterprise-ai-adoption/" target="_blank" rel="noopener">pymnts.com</a></li>
+      <li>TechTimes, <em>OpenAI Launches $4 Billion Enterprise AI Deployment Venture, Recruits McKinsey and Capgemini as Co-Funders</em>, May 2026. <a href="https://www.techtimes.com/articles/316726/20260516/openai-launches-4-billion-enterprise-ai-deployment-venture-recruits-mckinsey-capgemini.htm" target="_blank" rel="noopener">techtimes.com</a></li>
+      <li>CNBC, <em>OpenAI revenue chief Dresser says enterprise AI adoption is 'at a tipping point'</em>, May 2026. <a href="https://www.cnbc.com/2026/05/11/open-ai-dresser-enterprise-business.html" target="_blank" rel="noopener">cnbc.com</a></li>
+      <li>Deloitte US, <em>The State of AI in the Enterprise — 2026 AI Report</em>. <a href="https://www.deloitte.com/us/en/what-we-do/capabilities/applied-artificial-intelligence/content/state-of-ai-in-the-enterprise.html" target="_blank" rel="noopener">deloitte.com</a></li>
+      <li>SiliconANGLE, <em>AI Factory growth drives Dell's enterprise AI strategy</em>, May 2026. <a href="https://siliconangle.com/2026/05/12/dell-technologies-world-ai-factory-thecube-delltechworld/" target="_blank" rel="noopener">siliconangle.com</a></li>
+    </ol>
+  </div>
+
+  <div class="article-footer-cta">
+    <p>Thinking through what AI implementation actually looks like for your organisation — beyond the strategy deck? Let's talk.</p>
+    <a href="../index.html#contact" class="btn-primary">Let's talk →</a>
+  </div>
+
+  <footer style="background:var(--black);border-top:1px solid rgba(255,255,255,0.06);padding:1.5rem 3rem;">
+    <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.25);">© 2026 Luca Giacomelli · AI Advisor & Architect</p>
+    </div>
+  </footer>
+
+  <script src="../data/insights.js"></script>
+  <script src="../js/subscription.js"></script>
+  <script src="../js/paywall.js"></script>
+</body>
+</html>
