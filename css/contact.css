@@ -56,11 +56,22 @@
 .contact-links {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
 }
 
-/* Override Google Calendar scheduling widget button to match btn-white */
+.booking-widget {
+  display: inline-block;
+  width: auto;
+  min-width: 0;
+}
+
+.booking-widget .qxCTlb,
+.booking-widget button,
+.contact-links .qxCTlb,
 .contact-links button {
   background: #fff !important;
   color: #080808 !important;
@@ -77,10 +88,58 @@
   cursor: pointer !important;
   transition: opacity 0.2s, transform 0.2s !important;
   display: inline-block !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
 }
+
+.booking-widget .qxCTlb:hover,
+.booking-widget button:hover,
+.contact-links .qxCTlb:hover,
 .contact-links button:hover {
   opacity: 0.88 !important;
   transform: translateY(-1px) !important;
+}
+
+/* Make the embedded booking dialog look neat and readable on the dark background */
+.booking-widget iframe,
+iframe[src*="calendar.google.com/calendar/appointments"],
+iframe.mmGMM {
+  width: min(100%, 980px) !important;
+  max-width: calc(100vw - 80px) !important;
+  min-height: 700px !important;
+  height: 700px !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 28px !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 0 36px 100px rgba(0, 0, 0, 0.34) !important;
+  margin: 1.25rem auto 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 900px) {
+  .contact-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .booking-widget,
+  .booking-widget .qxCTlb,
+  .booking-widget button,
+  .contact-links .qxCTlb,
+  .contact-links button,
+  .btn-white,
+  .btn-outline-white {
+    width: min(100%, 240px);
+  }
+
+  .booking-widget iframe,
+  iframe[src*="calendar.google.com/calendar/appointments"],
+  iframe.mmGMM {
+    width: min(100vw - 24px, 100%) !important;
+    max-width: calc(100vw - 24px) !important;
+    min-height: 580px !important;
+    height: 580px !important;
+  }
 }
 
 /* ─── FOOTER ──────────────────────────── */
